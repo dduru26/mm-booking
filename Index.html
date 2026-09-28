@@ -224,4 +224,542 @@
       <div><h1>Anything the rider should know?</h1><p class="sub">Optional. It helps us handle it properly.</p></div>
       <div><div class="lbl">What is it?</div><div class="chips" data-group="item"><button class="chip">Food</button><button class="chip">Documents</button><button class="chip">Clothes</button><button class="chip">Laundry</button><button class="chip">Electronics</button><button class="chip">Other</button></div></div>
       <div><div class="lbl">Roughly how heavy?</div><div class="chips" data-group="weight"><button class="chip">Under 2 kg</button><button class="chip">2–5 kg</button><button class="chip">5–10 kg</button><button class="chip">Over 10 kg</button></div></div>
-      <button class="opt" id="fragileBtn" aria-pressed="false" style="min-height:56px"><span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
+      <button class="opt" id="fragileBtn" aria-pressed="false" style="min-height:56px"><span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span><b>Fragile, handle with care</b><small>Kept upright, carried separately</small></span></button>
+      <div><div class="lbl">Who pays for delivery?</div><div class="chips" data-group="payer"><button class="chip">Sender</button><button class="chip">Receiver</button></div></div>
+      <div><div class="lbl">How?</div><div class="chips" data-group="payMethod"><button class="chip">MoMo</button><button class="chip">Cash</button></div></div>
+      <div><label class="lbl" for="notes">Notes for the rider</label><textarea id="notes" class="inp" maxlength="300" placeholder="e.g. call when you're at the gate"></textarea></div>
+    </section>
+
+    <!-- REVIEW -->
+    <section data-step="review">
+      <div><h1>Check and confirm</h1><p class="sub">Tap Edit to change anything.</p></div>
+      <div class="table" id="reviewList"></div>
+      <p class="sub" style="font-size:13.5px;margin:0">Confirming saves your order and opens WhatsApp with it typed out. Send that message and we'll assign a rider. Nothing is charged yet.</p>
+      <p class="err" id="sendErr"></p>
+    </section>
+
+    <!-- DONE -->
+    <section data-step="done" class="done">
+      <div class="big"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h1 id="doneTitle">Order received</h1>
+      <p class="sub" id="doneSub" style="margin:0">WhatsApp should open with your order. Press send so we can assign a rider.</p>
+      <a class="cta" id="waLink" href="#" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Open WhatsApp</a>
+      <button class="ghost" id="againBtn">Book another delivery</button>
+    </section>
+  </main>
+
+  <footer class="bar" id="bar">
+    <button class="cta" id="nextBtn">Get my price</button>
+    <button class="link-btn" id="skipBtn" hidden>Skip this step</button>
+    <p class="bar-note" id="barNote" hidden></p>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+/* =====================================================================
+   CONFIG — edit these two lines
+   ===================================================================== */
+var CONFIG = {
+  SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx5UplBs9aj-1liiOeWVGEvlHxFvEqeEDbFHVoekW90JN92uq2660fNWZOBq6bLnNOZ/exec',
+  WHATSAPP: '250XXXXXXXXX',                             // business WhatsApp, digits only, e.g. 250795927849
+  CENTER: [-1.9499, 30.0913],                           // Kigali
+  BOUNDS: [[-2.10, 29.95], [-1.80, 30.30]]
+};
+
+/* ===================================================================== */
+var $ = function (id) { return document.getElementById(id); };
+var S = {
+  step: 'welcome', pickup: null, drop: null, size: '', quote: null, quoteKey: '', quoting: false,
+  when: 'now', whenAt: '', handover: '', sender: { name: '', phone: '' }, receiver: { name: '', phone: '' },
+  customer: { name: '', phone: '' }, details: { item: '', weight: '', fragile: false, payer: '', payMethod: '', notes: '' },
+  orderId: '', sending: false
+};
+
+/* ---------- storage (returning customers) ---------- */
+function load(k) { try { return JSON.parse(localStorage.getItem('mm_' + k)); } catch (e) { return null; } }
+function save(k, v) { try { localStorage.setItem('mm_' + k, JSON.stringify(v)); } catch (e) {} }
+var saved = load('customer');
+if (saved && saved.name) { S.customer = saved; }
+
+/* ---------- steps ---------- */
+function seq() {
+  var a = ['welcome', 'pickup', 'drop', 'size', 'price', 'handover', 'receiver'];
+  if (S.handover === 'other') a.push('you');
+  return a.concat(['details', 'review', 'done']);
+}
+var LABELS = { welcome: 'Get my price', pickup: 'Continue', drop: 'Continue', size: 'See my price', price: 'Book this delivery',
+  handover: 'Continue', receiver: 'Continue', you: 'Continue', details: 'Continue', review: 'Confirm on WhatsApp' };
+
+function go(step) {
+  S.step = step;
+  var section = (step === 'pickup' || step === 'drop') ? 'loc' : step;
+  document.querySelectorAll('main section').forEach(function (s) { s.classList.toggle('on', s.dataset.step === section); });
+  var prog = seq().filter(function (x) { return x !== 'welcome' && x !== 'done'; });
+  var i = prog.indexOf(step);
+  $('top').hidden = (step === 'welcome' || step === 'done');
+  $('bar').hidden = (step === 'done');
+  if (i >= 0) { $('progLabel').textContent = 'STEP ' + (i + 1) + ' OF ' + prog.length; $('progFill').style.width = Math.round((i + 1) / prog.length * 100) + '%'; }
+  $('nextBtn').textContent = LABELS[step] || 'Continue';
+  $('nextBtn').disabled = false;
+  $('nextBtn').onclick = null;
+  $('skipBtn').hidden = step !== 'details';
+  $('barNote').hidden = step !== 'price';
+  $('barNote').textContent = 'No payment now. You confirm on WhatsApp.';
+  clearErrors();
+  window.scrollTo(0, 0);
+  if (enter[step]) enter[step]();
+}
+function back() { var a = seq(); var i = a.indexOf(S.step); if (i > 0) go(a[i - 1]); }
+function next() {
+  if (validate[S.step] && !validate[S.step]()) return;
+  if (S.step === 'review') { return submitOrder(); }
+  var a = seq(); go(a[a.indexOf(S.step) + 1]);
+}
+function clearErrors() { document.querySelectorAll('.err').forEach(function (e) { e.textContent = ''; }); document.querySelectorAll('.inp.bad').forEach(function (e) { e.classList.remove('bad'); }); }
+function fieldErr(id, msg) { var p = document.querySelector('[data-err="' + id + '"]'); if (p) p.textContent = msg; $(id).classList.add('bad'); }
+
+/* ---------- phone ---------- */
+function phone(v) {
+  var d = String(v || '').replace(/\D/g, '');
+  if (d.indexOf('250') === 0) d = d.slice(3);
+  if (d.charAt(0) === '0') d = d.slice(1);
+  var ok = /^7[2389]\d{7}$/.test(d);
+  return { ok: ok, local: ok ? '0' + d : '', pretty: ok ? '0' + d.slice(0, 2) + ' ' + d.slice(2, 5) + ' ' + d.slice(5) : String(v || '') };
+}
+var PHONE_ERR = 'Enter a Rwandan mobile number, e.g. 078 123 4567.';
+
+/* ---------- plus codes (Open Location Code) ---------- */
+var OLC = '23456789CFGHJMPQRVWX';
+function olcEncode(lat, lng) {
+  lat = Math.min(89.9999999, Math.max(-90, lat)); lng = ((lng + 180) % 360 + 360) % 360 - 180;
+  var a = Math.floor((lat + 90) * 8000), b = Math.floor((lng + 180) * 8000), c = '';
+  for (var i = 0; i < 5; i++) { c = OLC.charAt(a % 20) + OLC.charAt(b % 20) + c; a = Math.floor(a / 20); b = Math.floor(b / 20); }
+  return c.slice(0, 8) + '+' + c.slice(8);
+}
+function olcDecode(code) {
+  var d = code.replace('+', '').toUpperCase().slice(0, 10), lat = -90, lng = -180, res = [20, 1, .05, .0025, .000125];
+  for (var i = 0; i < d.length; i += 2) { lat += OLC.indexOf(d[i]) * res[i / 2]; lng += OLC.indexOf(d[i + 1]) * res[i / 2]; }
+  var r = res[d.length / 2 - 1]; return { lat: lat + r / 2, lng: lng + r / 2 };
+}
+function olcRecover(short) {
+  short = short.toUpperCase(); var pad = 8 - short.indexOf('+');
+  if (pad <= 0) return olcDecode(short);
+  var ref = CONFIG.CENTER, full = olcEncode(ref[0], ref[1]).slice(0, pad) + short, p = olcDecode(full), res = Math.pow(20, 2 - pad / 2);
+  if (p.lat - ref[0] > res / 2) p.lat -= res; if (p.lat - ref[0] < -res / 2) p.lat += res;
+  if (p.lng - ref[1] > res / 2) p.lng -= res; if (p.lng - ref[1] < -res / 2) p.lng += res;
+  return p;
+}
+function shortPlus(lat, lng) { return olcEncode(lat, lng).slice(4); }
+
+/* ---------- map ---------- */
+var map, mA, mB;
+function pinIcon(letter, color) {
+  return L.divIcon({ className: '', html: '<div class="pin" style="background:' + color + '"><span>' + letter + '</span></div>', iconSize: [30, 30], iconAnchor: [15, 30] });
+}
+function initMap() {
+  if (map) return;
+  map = L.map('map', { zoomControl: true, attributionControl: true, maxBounds: [[-2.4, 29.6], [-1.5, 30.6]] }).setView(CONFIG.CENTER, 13);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+  map.on('click', function (e) { setPoint(cur(), e.latlng.lat, e.latlng.lng, null); });
+}
+function cur() { return S.step === 'drop' ? 'drop' : 'pickup'; }
+function drawMarkers() {
+  [['pickup', 'A', '#16130F'], ['drop', 'B', '#B93C14']].forEach(function (d) {
+    var p = S[d[0]], key = d[0] === 'pickup' ? 'mA' : 'mB', m = key === 'mA' ? mA : mB;
+    var show = p && (d[0] === 'pickup' || S.step === 'drop');
+    if (!show) { if (m) { map.removeLayer(m); } if (key === 'mA') mA = null; else mB = null; return; }
+    if (!m) {
+      m = L.marker([p.lat, p.lng], { icon: pinIcon(d[1], d[2]), draggable: true });
+      m.on('dragend', function (ev) { var ll = ev.target.getLatLng(); setPoint(d[0], ll.lat, ll.lng, null); });
+      m.addTo(map);
+      if (key === 'mA') mA = m; else mB = m;
+    } else m.setLatLng([p.lat, p.lng]);
+    if (m.dragging) { if (d[0] === cur()) m.dragging.enable(); else m.dragging.disable(); }
+    m.setOpacity(d[0] === cur() ? 1 : 0.55);
+  });
+}
+function setPoint(which, lat, lng, name, silentFly) {
+  var prevNote = S[which] ? S[which].note : '';
+  S[which] = { lat: +lat.toFixed(6), lng: +lng.toFixed(6), name: name || 'Pinned location', note: prevNote, plus: shortPlus(lat, lng) };
+  S.quoteKey = '';
+  drawMarkers();
+  if (!silentFly) {
+    if (which === 'drop' && S.pickup) map.fitBounds([[S.pickup.lat, S.pickup.lng], [lat, lng]], { padding: [40, 40], maxZoom: 16 });
+    else map.setView([lat, lng], Math.max(map.getZoom(), 16));
+  }
+  renderPicked();
+  $('locErr').textContent = '';
+  if (!name) reverse(which, lat, lng);
+}
+function renderPicked() {
+  var p = S[cur()];
+  $('picked').hidden = !p;
+  if (!p) return;
+  $('pickedBadge').textContent = cur() === 'drop' ? 'B' : 'A';
+  $('pickedBadge').style.background = cur() === 'drop' ? '#B93C14' : '#16130F';
+  $('pickedName').textContent = p.name;
+  $('pickedSub').textContent = p.plus + ' Kigali';
+  $('landmark').value = p.note || '';
+}
+function reverse(which, lat, lng) {
+  fetch('https://photon.komoot.io/reverse?lat=' + lat + '&lon=' + lng + '&limit=1')
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      var f = j.features && j.features[0]; if (!f || !S[which] || S[which].lat !== +lat.toFixed(6)) return;
+      var pr = f.properties || {};
+      var label = pr.name || [pr.street, pr.district || pr.locality].filter(Boolean).join(', ') || pr.district || pr.city;
+      if (label) { S[which].name = label; if (which === cur()) renderPicked(); }
+    }).catch(function () {});
+}
+
+/* ---------- search (Photon / OpenStreetMap) ---------- */
+var searchTimer;
+$('searchInput').addEventListener('input', function () {
+  clearTimeout(searchTimer);
+  var q = this.value.trim();
+  if (q.length < 2) { $('results').innerHTML = ''; return; }
+  searchTimer = setTimeout(function () { search(q); }, 350);
+});
+function search(q) {
+  var b = CONFIG.BOUNDS;
+  var url = 'https://photon.komoot.io/api/?q=' + encodeURIComponent(q) + '&limit=6&lat=' + CONFIG.CENTER[0] + '&lon=' + CONFIG.CENTER[1] +
+    '&bbox=' + [b[0][1], b[0][0], b[1][1], b[1][0]].join(',');
+  fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+    if ($('searchInput').value.trim() !== q) return;
+    var ul = $('results'); ul.innerHTML = '';
+    var feats = (j.features || []);
+    if (!feats.length) { var li = document.createElement('li'); li.className = 'empty'; li.textContent = 'No match. Tap the map to drop a pin instead.'; ul.appendChild(li); return; }
+    feats.forEach(function (f) {
+      var pr = f.properties || {}, c = f.geometry.coordinates;
+      var title = pr.name || pr.street || 'Unnamed place';
+      var detail = [pr.street && pr.name ? pr.street : '', pr.district || pr.locality, pr.city].filter(Boolean).join(', ');
+      var li = document.createElement('li'), btn = document.createElement('button'), b1 = document.createElement('b'), s1 = document.createElement('small');
+      b1.textContent = title; s1.textContent = detail; btn.appendChild(b1); btn.appendChild(s1);
+      btn.addEventListener('click', function () { ul.innerHTML = ''; $('searchInput').value = ''; $('searchInput').blur(); setPoint(cur(), c[1], c[0], title); });
+      li.appendChild(btn); ul.appendChild(li);
+    });
+  }).catch(function () { $('results').innerHTML = '<li class="empty">Search is unavailable right now. Tap the map instead.</li>'; });
+}
+
+/* ---------- GPS ---------- */
+$('gpsBtn').addEventListener('click', function () {
+  if (!navigator.geolocation) { $('locErr').textContent = 'Your browser can’t share location. Search or tap the map instead.'; return; }
+  $('gpsLabel').textContent = 'Locating…';
+  navigator.geolocation.getCurrentPosition(function (pos) {
+    $('gpsLabel').textContent = 'My location';
+    var acc = Math.round(pos.coords.accuracy);
+    setPoint(cur(), pos.coords.latitude, pos.coords.longitude, 'Your current location');
+    reverse(cur(), pos.coords.latitude, pos.coords.longitude);
+    map.setView([pos.coords.latitude, pos.coords.longitude], 17);
+    $('gpsNote').hidden = acc <= 60;
+    $('gpsNote').textContent = 'Accurate to about ' + acc + ' m. Drag the pin if it’s not quite right.';
+  }, function (err) {
+    $('gpsLabel').textContent = 'My location';
+    $('locErr').textContent = err.code === 1
+      ? 'Location is blocked. Allow it for this site in your browser settings, or search / tap the map instead.'
+      : 'We couldn’t get your location. Try again outside, or search / tap the map.';
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 30000 });
+});
+
+/* ---------- paste link / plus code ---------- */
+$('pasteBtn').addEventListener('click', function () { $('pasteBox').hidden = !$('pasteBox').hidden; if (!$('pasteBox').hidden) $('pasteInput').focus(); });
+$('pasteUse').addEventListener('click', usePaste);
+function parseCoords(s) {
+  try { s = decodeURIComponent(s); } catch (e) {}
+  var pats = [/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/, /[?&](?:q|query|ll|destination|center|daddr)=(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/i, /@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/, /^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$/];
+  for (var i = 0; i < pats.length; i++) { var m = s.match(pats[i]); if (m) return { lat: parseFloat(m[1]), lng: parseFloat(m[2]) }; }
+  var pc = s.toUpperCase().match(/([23456789CFGHJMPQRVWX]{2,8}\+[23456789CFGHJMPQRVWX]{2,3})/);
+  if (pc) { try { return olcRecover(pc[1]); } catch (e) {} }
+  return null;
+}
+function usePaste() {
+  var v = $('pasteInput').value.trim(); $('pasteErr').textContent = '';
+  if (!v) { $('pasteErr').textContent = 'Paste a link first.'; return; }
+  var ll = parseCoords(v);
+  if (ll) return applyPasted(ll);
+  if (/^https?:\/\//i.test(v) || /goo\.gl|maps\.app/i.test(v)) {
+    var url = /^https?:/i.test(v) ? v : 'https://' + v;
+    $('pasteUse').textContent = 'Reading link…';
+    fetch(CONFIG.SCRIPT_URL + '?action=resolve&url=' + encodeURIComponent(url)).then(function (r) { return r.json(); }).then(function (j) {
+      $('pasteUse').textContent = 'Use this location';
+      if (j.ok) applyPasted({ lat: j.lat, lng: j.lng }); else $('pasteErr').textContent = 'We couldn’t find a location in that link. Try searching or tapping the map.';
+    }).catch(function () { $('pasteUse').textContent = 'Use this location'; $('pasteErr').textContent = 'Couldn’t read that link right now.'; });
+    return;
+  }
+  $('pasteErr').textContent = 'That doesn’t look like a Maps link or plus code.';
+}
+function applyPasted(ll) { $('pasteBox').hidden = true; $('pasteInput').value = ''; setPoint(cur(), ll.lat, ll.lng, null); }
+
+$('landmark').addEventListener('input', function () { if (S[cur()]) S[cur()].note = this.value; });
+
+/* ---------- enter handlers ---------- */
+var enter = {
+  pickup: function () { locScreen(); },
+  drop: function () { locScreen(); },
+  size: function () { markOpts('[data-size]', 'size', S.size); $('largeNote').hidden = S.size !== 'Large'; },
+  price: function () { renderWhen(); getQuote(); },
+  handover: function () { markOpts('[data-handover]', 'handover', S.handover); showHandFields(); },
+  receiver: function () {
+    $('rName').value = S.receiver.name; $('rPhone').value = S.receiver.phone;
+    $('contactBtn').hidden = !('contacts' in navigator && 'select' in navigator.contacts);
+  },
+  you: function () { $('yName').value = S.customer.name; $('yPhone').value = S.customer.phone; },
+  details: function () { renderDetails(); },
+  review: function () { renderReview(); }
+};
+function locScreen() {
+  var drop = S.step === 'drop';
+  $('locTitle').textContent = drop ? 'Where is it going?' : 'Where are we picking up?';
+  $('locSub').textContent = drop ? 'Search, paste a link, or drop a pin where the receiver is.' : 'Use your location, search, paste a link from WhatsApp or Google Maps, or drop a pin.';
+  $('gpsNote').hidden = true; $('dropTip').hidden = !drop; $('pasteBox').hidden = true; $('results').innerHTML = ''; $('searchInput').value = '';
+  initMap();
+  setTimeout(function () {
+    map.invalidateSize();
+    drawMarkers();
+    if (drop && S.pickup && S.drop) map.fitBounds([[S.pickup.lat, S.pickup.lng], [S.drop.lat, S.drop.lng]], { padding: [40, 40] });
+    else if (S[cur()]) map.setView([S[cur()].lat, S[cur()].lng], 16);
+    else if (drop && S.pickup) map.setView([S.pickup.lat, S.pickup.lng], 13);
+    else map.setView(CONFIG.CENTER, 13);
+  }, 30);
+  renderPicked();
+}
+function markOpts(sel, attr, val) { document.querySelectorAll(sel).forEach(function (b) { b.classList.toggle('on', b.dataset[attr] === val); }); }
+
+/* ---------- size ---------- */
+document.querySelectorAll('[data-size]').forEach(function (b) {
+  b.addEventListener('click', function () { S.size = b.dataset.size; markOpts('[data-size]', 'size', S.size); $('largeNote').hidden = S.size !== 'Large'; $('sizeErr').textContent = ''; });
+});
+
+/* ---------- price ---------- */
+function fmt(n) { return Number(n).toLocaleString('en-US'); }
+function getQuote() {
+  var key = [S.pickup.lat, S.pickup.lng, S.drop.lat, S.drop.lng].join(',');
+  if (S.quote && S.quoteKey === key) return renderPrice();
+  S.quoting = true; S.quote = null; $('nextBtn').disabled = true;
+  $('priceBox').innerHTML = '<div class="skeleton" aria-label="Calculating your price"></div>';
+  var url = CONFIG.SCRIPT_URL + '?action=quote&pLat=' + S.pickup.lat + '&pLng=' + S.pickup.lng + '&dLat=' + S.drop.lat + '&dLng=' + S.drop.lng;
+  fetch(url).then(function (r) { return r.json(); }).then(function (j) {
+    S.quoting = false;
+    if (!j.ok) throw new Error(j.error || 'quote failed');
+    S.quote = j; S.quoteKey = key; renderPrice();
+  }).catch(function () {
+    S.quoting = false; $('nextBtn').disabled = false; $('nextBtn').textContent = 'Try again';
+    $('priceBox').innerHTML = '<h1>We couldn’t get a price</h1><p class="sub">Check your connection and try again, or send both pins on WhatsApp.</p>';
+  });
+}
+function renderPrice() {
+  var q = S.quote, box = $('priceBox');
+  $('nextBtn').disabled = false;
+  if (!q.inArea) {
+    $('whenBox').hidden = true; $('nextBtn').textContent = 'Change locations'; $('barNote').hidden = true;
+    box.innerHTML = '<h1>We’ll quote this one personally</h1><p class="sub">One of the pins is outside Kigali, where we don’t run yet. Change a location, or send both pins on WhatsApp.</p>';
+    return;
+  }
+  $('whenBox').hidden = false; $('nextBtn').textContent = LABELS.price;
+  box.innerHTML = '';
+  var card = document.createElement('div'); card.className = 'price';
+  card.innerHTML = '<div class="k mono">YOUR DELIVERY FEE</div><div class="v"></div><div class="m"></div>' +
+    '<div class="route"><div><span class="dot" style="background:#F5F1EA;color:#16130F">A</span><span class="a"></span></div><div><span class="dot" style="background:#B93C14;color:#fff">B</span><span class="b"></span></div></div>';
+  card.querySelector('.v').textContent = fmt(q.fee) + ' RWF';
+  card.querySelector('.m').textContent = q.km.toFixed(1) + ' km by road · about ' + q.mins + ' min' + (q.source === 'estimate' ? ' · estimated' : '');
+  card.querySelector('.a').textContent = S.pickup.name; card.querySelector('.b').textContent = S.drop.name;
+  box.appendChild(card);
+  var t = document.createElement('div'); t.className = 'table'; t.style.marginTop = '16px';
+  var rows = [['Base fare', q.base]].concat(q.lines.map(function (l) { return [l.label, l.amount]; }));
+  rows.forEach(function (r) { var d = document.createElement('div'); d.className = 'row'; var a = document.createElement('span'), b = document.createElement('span'); a.textContent = r[0]; b.textContent = fmt(r[1]) + ' RWF'; d.appendChild(a); d.appendChild(b); t.appendChild(d); });
+  var tot = document.createElement('div'); tot.className = 'row total'; tot.innerHTML = '<span>Total</span><span></span>'; tot.lastChild.textContent = fmt(q.fee) + ' RWF'; t.appendChild(tot);
+  box.appendChild(t);
+}
+document.querySelectorAll('[data-when]').forEach(function (b) {
+  b.addEventListener('click', function () { S.when = b.dataset.when; renderWhen(); });
+});
+$('whenAt').addEventListener('change', function () { S.whenAt = this.value; });
+function renderWhen() {
+  document.querySelectorAll('[data-when]').forEach(function (b) { b.classList.toggle('on', b.dataset.when === S.when); });
+  $('laterBox').hidden = S.when !== 'later';
+  var now = new Date(Date.now() + 30 * 60000 - new Date().getTimezoneOffset() * 60000);
+  $('whenAt').min = now.toISOString().slice(0, 16);
+  $('whenAt').value = S.whenAt;
+}
+
+/* ---------- handover ---------- */
+document.querySelectorAll('[data-handover]').forEach(function (b) {
+  b.addEventListener('click', function () { S.handover = b.dataset.handover; markOpts('[data-handover]', 'handover', S.handover); showHandFields(); $('handErr').textContent = ''; });
+});
+function showHandFields() {
+  $('meFields').hidden = S.handover !== 'me'; $('otherFields').hidden = S.handover !== 'other';
+  $('meName').value = S.customer.name; $('mePhone').value = S.customer.phone;
+  $('sName').value = S.sender.name; $('sPhone').value = S.sender.phone;
+}
+
+/* ---------- contacts (Android Chrome only) ---------- */
+$('contactBtn').addEventListener('click', function () {
+  navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (list) {
+    var c = list && list[0]; if (!c) return;
+    if (c.name && c.name[0]) $('rName').value = c.name[0];
+    if (c.tel && c.tel[0]) $('rPhone').value = c.tel[0];
+  }).catch(function () {});
+});
+
+/* ---------- details ---------- */
+document.querySelectorAll('[data-group]').forEach(function (g) {
+  g.querySelectorAll('.chip').forEach(function (c) {
+    c.addEventListener('click', function () { var k = g.dataset.group; S.details[k] = S.details[k] === c.textContent ? '' : c.textContent; renderDetails(); });
+  });
+});
+$('fragileBtn').addEventListener('click', function () { S.details.fragile = !S.details.fragile; renderDetails(); });
+$('notes').addEventListener('input', function () { S.details.notes = this.value; });
+function renderDetails() {
+  document.querySelectorAll('[data-group]').forEach(function (g) { g.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', S.details[g.dataset.group] === c.textContent); }); });
+  $('fragileBtn').classList.toggle('on', S.details.fragile); $('fragileBtn').setAttribute('aria-pressed', String(S.details.fragile));
+  $('notes').value = S.details.notes;
+}
+
+/* ---------- validation ---------- */
+function nameOk(v) { return String(v || '').trim().length > 1; }
+var validate = {
+  pickup: function () { if (!S.pickup) { $('locErr').textContent = 'Set a pickup point to continue.'; return false; } return true; },
+  drop: function () { if (!S.drop) { $('locErr').textContent = 'Set a drop-off point to continue.'; return false; } return true; },
+  size: function () {
+    if (!S.size) { $('sizeErr').textContent = 'Choose a size to see your price.'; return false; }
+    if (S.size === 'Large') { $('sizeErr').textContent = 'This one needs a chat. Message us on WhatsApp.'; return false; }
+    return true;
+  },
+  price: function () {
+    if (S.quoting) return false;
+    if (!S.quote) { getQuote(); return false; }
+    if (!S.quote.inArea) { go('pickup'); return false; }
+    if (S.when === 'later' && !S.whenAt) { $('whenErr').textContent = 'Choose a pickup date and time.'; return false; }
+    return true;
+  },
+  handover: function () {
+    if (!S.handover) { $('handErr').textContent = 'Choose who hands it over.'; return false; }
+    var ok = true;
+    if (S.handover === 'me') {
+      S.customer = { name: $('meName').value.trim(), phone: $('mePhone').value.trim() };
+      if (!nameOk(S.customer.name)) { fieldErr('meName', 'Add your name.'); ok = false; }
+      if (!phone(S.customer.phone).ok) { fieldErr('mePhone', PHONE_ERR); ok = false; }
+    } else {
+      S.sender = { name: $('sName').value.trim(), phone: $('sPhone').value.trim() };
+      if (!nameOk(S.sender.name)) { fieldErr('sName', 'Add their name.'); ok = false; }
+      if (!phone(S.sender.phone).ok) { fieldErr('sPhone', PHONE_ERR); ok = false; }
+    }
+    return ok;
+  },
+  receiver: function () {
+    S.receiver = { name: $('rName').value.trim(), phone: $('rPhone').value.trim() };
+    var ok = true;
+    if (!nameOk(S.receiver.name)) { fieldErr('rName', 'Add the receiver’s name.'); ok = false; }
+    if (!phone(S.receiver.phone).ok) { fieldErr('rPhone', PHONE_ERR); ok = false; }
+    return ok;
+  },
+  you: function () {
+    S.customer = { name: $('yName').value.trim(), phone: $('yPhone').value.trim() };
+    var ok = true;
+    if (!nameOk(S.customer.name)) { fieldErr('yName', 'Add your name.'); ok = false; }
+    if (!phone(S.customer.phone).ok) { fieldErr('yPhone', PHONE_ERR); ok = false; }
+    return ok;
+  }
+};
+
+/* ---------- review ---------- */
+function whenText() { return S.when === 'later' && S.whenAt ? new Date(S.whenAt).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'As soon as possible'; }
+function handText() { return S.handover === 'other' ? S.sender.name + ' · ' + phone(S.sender.phone).pretty : 'You · ' + phone(S.customer.phone).pretty; }
+function parcelText() { var d = S.details; return [S.size, d.item, d.weight, d.fragile ? 'Fragile' : ''].filter(Boolean).join(' · '); }
+function renderReview() {
+  var list = $('reviewList'); list.innerHTML = '';
+  var rows = [
+    ['PICKUP · A', S.pickup.name + (S.pickup.note ? ' — ' + S.pickup.note : ''), 'Hand over: ' + handText(), 'pickup'],
+    ['DROP-OFF · B', S.drop.name + (S.drop.note ? ' — ' + S.drop.note : ''), 'Receiver: ' + S.receiver.name + ' · ' + phone(S.receiver.phone).pretty, 'drop'],
+    ['PARCEL', parcelText() || '—', [S.details.payer ? S.details.payer + ' pays' : '', S.details.payMethod, S.details.notes ? 'Note: ' + S.details.notes : ''].filter(Boolean).join(' · ') || 'No notes', 'details'],
+    ['WHEN', whenText(), S.quote.km.toFixed(1) + ' km · about ' + S.quote.mins + ' min', 'price'],
+    ['YOUR CONTACT', S.customer.name, phone(S.customer.phone).pretty, S.handover === 'other' ? 'you' : 'handover']
+  ];
+  rows.forEach(function (r) {
+    var row = document.createElement('div'); row.className = 'review-row';
+    row.innerHTML = '<div><span class="k mono"></span><span class="v"></span><span class="s"></span></div><button type="button">Edit</button>';
+    row.querySelector('.k').textContent = r[0]; row.querySelector('.v').textContent = r[1]; row.querySelector('.s').textContent = r[2];
+    row.querySelector('button').addEventListener('click', function () { go(r[3]); });
+    list.appendChild(row);
+  });
+  var fee = document.createElement('div'); fee.className = 'row total'; fee.style.fontSize = '16px'; fee.style.padding = '14px 0';
+  fee.innerHTML = '<span>Delivery fee</span><span style="font-size:22px"></span>'; fee.lastChild.textContent = fmt(S.quote.fee) + ' RWF';
+  list.appendChild(fee);
+}
+
+/* ---------- submit + WhatsApp ---------- */
+function mapsLink(p) { return 'https://maps.google.com/?q=' + p.lat + ',' + p.lng; }
+function message() {
+  var p = S.pickup, d = S.drop;
+  return [
+    'New delivery · ' + (S.orderId || 'web booking'),
+    '',
+    'PICKUP: ' + p.name + (p.note ? ' (' + p.note + ')' : ''),
+    p.plus + ' Kigali · ' + mapsLink(p),
+    'Hand over: ' + handText(),
+    '',
+    'DROP-OFF: ' + d.name + (d.note ? ' (' + d.note + ')' : ''),
+    d.plus + ' Kigali · ' + mapsLink(d),
+    'Receiver: ' + S.receiver.name + ' · ' + phone(S.receiver.phone).pretty,
+    '',
+    'PARCEL: ' + (parcelText() || '—') + (S.details.notes ? '\nNote: ' + S.details.notes : ''),
+    'WHEN: ' + whenText(),
+    'FEE: ' + fmt(S.quote.fee) + ' RWF (' + S.quote.km.toFixed(1) + ' km)' + (S.details.payer ? ' · ' + S.details.payer + ' pays' : '') + (S.details.payMethod ? ' by ' + S.details.payMethod : ''),
+    '',
+    'From: ' + S.customer.name + ' · ' + phone(S.customer.phone).pretty
+  ].join('\n');
+}
+function waUrl() { return 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(message()); }
+
+function submitOrder() {
+  if (S.sending) return;
+  S.sending = true; $('nextBtn').disabled = true; $('nextBtn').textContent = 'Sending…'; $('sendErr').textContent = '';
+  var payload = {
+    pickup: S.pickup, drop: S.drop, size: S.size, when: S.when, whenAt: S.whenAt,
+    handover: { type: S.handover, name: S.sender.name, phone: S.sender.phone },
+    receiver: S.receiver, customer: S.customer, details: S.details
+  };
+  fetch(CONFIG.SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+    .then(function (r) { return r.json(); })
+    .then(function (j) {
+      S.sending = false;
+      if (!j.ok) throw new Error(j.error);
+      S.orderId = j.orderId;
+      if (j.fee) { S.quote.fee = j.fee; S.quote.km = j.km; }
+      finish(true);
+    })
+    .catch(function (err) {
+      S.sending = false; $('nextBtn').disabled = false; $('nextBtn').textContent = LABELS.review;
+      if (String(err && err.message) === 'outside') { $('sendErr').textContent = 'One of the pins is outside our area. Tap Edit to change it.'; return; }
+      $('sendErr').textContent = 'We couldn’t save your order online. Tap below to send it on WhatsApp instead.';
+      $('nextBtn').textContent = 'Send on WhatsApp instead';
+      $('nextBtn').onclick = function () { finish(false); };
+    });
+}
+function finish(saved) {
+  save('customer', { name: S.customer.name, phone: S.customer.phone });
+  $('doneTitle').textContent = saved ? 'Order ' + S.orderId + ' received' : 'Almost there';
+  $('doneSub').textContent = saved ? 'WhatsApp should open with your order. Press send so we can assign a rider.' : 'Send the message in WhatsApp and we’ll take it from there.';
+  $('waLink').href = waUrl();
+  go('done');
+  setTimeout(function () { window.location.href = waUrl(); }, 400);
+}
+$('againBtn').addEventListener('click', function () {
+  var c = S.customer;
+  S.pickup = S.drop = S.quote = null; S.quoteKey = ''; S.size = ''; S.when = 'now'; S.whenAt = ''; S.handover = '';
+  S.sender = { name: '', phone: '' }; S.receiver = { name: '', phone: '' }; S.customer = c; S.orderId = '';
+  S.details = { item: '', weight: '', fragile: false, payer: '', payMethod: '', notes: '' };
+  $('nextBtn').onclick = null;
+  if (mA) { map.removeLayer(mA); mA = null; } if (mB) { map.removeLayer(mB); mB = null; }
+  go('welcome');
+});
+
+/* ---------- wire up ---------- */
+$('nextBtn').addEventListener('click', function () { if (!this.onclick) next(); });
+$('skipBtn').addEventListener('click', function () { go(seq()[seq().indexOf('details') + 1]); });
+$('backBtn').addEventListener('click', back);
+if (/X/.test(250781727394)) console.warn('Moving Man: set CONFIG.WHATSAPP to the business WhatsApp number (digits only).');
+</script>
+</body>
+</html>
