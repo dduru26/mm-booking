@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16130F">
+<title>Book a delivery · Moving Man</title>
+<meta name="description" content="Drop two pins, see your price, confirm on WhatsApp.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --ink:#16130F; --ink2:#3F3A34; --muted:#5B544C; --line:#D8D0C4; --soft:#EEE8DE;
+    --bg:#F5F1EA; --card:#FFFFFF; --accent:#B93C14; --accent-d:#8F2E0F; --bad:#B42318; --warn-bg:#FEF0D6; --warn:#6B3A03;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',system-ui,-apple-system,Segoe UI,sans-serif;-webkit-text-size-adjust:100%}
+  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
+  .app{max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  .top{position:sticky;top:0;z-index:1000;background:var(--bg);height:64px;display:flex;align-items:center;gap:12px;padding:0 16px}
+  .icon-btn{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;padding:0;flex:none}
+  .prog{flex:1;display:flex;flex-direction:column;gap:6px}
+  .prog-label{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  .prog-track{height:6px;background:#E3DCD0;border-radius:3px;overflow:hidden}
+  .prog-fill{height:6px;background:var(--accent);border-radius:3px;width:0;transition:width .25s ease}
+  .brand{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .brand i{width:8px;height:8px;border-radius:4px;background:var(--accent);display:inline-block}
+  main{flex:1;padding:4px 20px 24px}
+  section{display:none;flex-direction:column;gap:16px}
+  section.on{display:flex;animation:in .2s ease}
+  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  h1{margin:0;font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+  .sub{margin:6px 0 0;font-size:15px;line-height:1.45;color:var(--muted)}
+  .bar{position:sticky;bottom:0;z-index:1000;background:var(--bg);border-top:1px solid #E3DCD0;padding:12px 20px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
+  .cta{width:100%;height:54px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:17px;font-weight:600;transition:transform .12s ease,opacity .15s}
+  .cta:active{transform:scale(.98)} .cta[disabled]{opacity:.55}
+  .cta.dark{background:var(--ink)}
+  .link-btn{border:0;background:transparent;font-size:15px;font-weight:600;color:var(--ink2);min-height:44px}
+  .bar-note{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
+  .ghost{min-height:46px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px}
+  .ghost.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  label.lbl,.lbl{font-size:13.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
+  .inp{width:100%;height:52px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:17px;background:var(--card);color:var(--ink);font-family:inherit;outline:none;-webkit-appearance:none}
+  .inp:focus{border-color:var(--ink)} .inp.bad{border-color:var(--bad)}
+  textarea.inp{height:88px;padding:12px 14px;resize:none;line-height:1.4}
+  .err{font-size:13.5px;color:var(--bad);margin:6px 0 0;line-height:1.35}
+  .err:empty{display:none}
+  .note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45}
+  .note.grey{background:#EDE7DD;color:var(--ink2)}
+  .opt{width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:center;min-height:68px;color:var(--ink)}
+  .opt.on{border:2px solid var(--ink);box-shadow:0 0 0 4px rgba(185,60,20,.14)}
+  .opt b{display:block;font-size:16.5px} .opt small{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
+  .tag{width:44px;height:44px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{min-height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--line);background:var(--card);font-size:14.5px;font-weight:500;color:var(--ink)}
+  .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .search{position:relative}
+  .search svg{position:absolute;left:14px;top:17px;pointer-events:none}
+  .search .inp{padding-left:42px}
+  .results{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+  .results:empty{display:none}
+  .results button{width:100%;text-align:left;background:var(--card);border:0;border-bottom:1px solid var(--soft);padding:10px 14px;min-height:52px;display:flex;flex-direction:column;gap:2px;color:var(--ink)}
+  .results li:last-child button{border-bottom:0}
+  .results b{font-size:15.5px} .results small{font-size:13px;color:var(--muted)}
+  .results .empty{padding:14px;font-size:14px;color:var(--muted)}
+  #map{width:100%;height:260px;border-radius:16px;border:1.5px solid var(--line);overflow:hidden;background:#E8E2D6;z-index:0}
+  .hint{font-size:13px;color:var(--muted);margin:-8px 0 0}
+  .pin{width:30px;height:30px;border-radius:15px 15px 15px 2px;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
+  .pin span{transform:rotate(45deg);color:#fff;font-weight:700;font-size:12px}
+  .picked{background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
+  .picked-row{display:flex;gap:12px;align-items:center}
+  .badge{width:36px;height:36px;border-radius:18px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+  .picked-name{font-size:16.5px;font-weight:700} .picked-sub{font-size:13px;color:var(--muted)}
+  .price{background:var(--ink);color:#F5F1EA;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:10px}
+  .price .k{font-size:12px;letter-spacing:.1em;color:#F08A63;font-weight:600}
+  .price .v{font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
+  .price .m{font-size:15px;color:#D9D0C4}
+  .route{display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid #3A342E;font-size:14.5px}
+  .route div{display:flex;gap:10px;align-items:center}
+  .dot{width:20px;height:20px;border-radius:10px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+  .table{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 16px}
+  .row{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;padding:10px 0;border-bottom:1px solid var(--soft)}
+  .row:last-child{border-bottom:0} .row.total{font-weight:700}
+  .skeleton{height:170px;border-radius:22px;background:linear-gradient(90deg,#E8E1D5 0%,#F1ECE3 50%,#E8E1D5 100%);background-size:200% 100%;animation:sk 1.2s infinite}
+  @keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
+  .review-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--soft)}
+  .review-row div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+  .review-row .k{font-size:11px;letter-spacing:.08em;color:#6B6258;font-weight:600}
+  .review-row .v{font-size:15.5px;font-weight:600;overflow-wrap:anywhere}
+  .review-row .s{font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
+  .review-row button{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:14.5px;min-height:44px;padding:0 4px}
+  .hero{background:var(--ink);color:#F5F1EA;border-radius:22px;padding:26px 22px;display:flex;flex-direction:column;gap:12px}
+  .hero .k{font-size:12px;letter-spacing:.1em;color:#F08A63;font-weight:600}
+  .hero h1{font-size:32px;line-height:1.1;letter-spacing:-.02em}
+  .hero p{margin:0;font-size:16px;line-height:1.45;color:#D9D0C4}
+  .perk{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.4}
+  .perk svg{flex:none;margin-top:1px}
+  .check{width:26px;height:26px;border-radius:7px;border:2px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+  .opt.on .check{background:var(--ink)}
+  .done{align-items:stretch;text-align:left;padding-top:28px}
+  .done .big{width:64px;height:64px;border-radius:32px;background:var(--ink);display:flex;align-items:center;justify-content:center}
+  .sr{position:absolute;left:-9999px}
+  .leaflet-control-attribution{font-size:10px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top" id="top" hidden>
+    <button class="icon-btn" id="backBtn" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <div class="prog"><div class="prog-label mono" id="progLabel">STEP 1 OF 8</div><div class="prog-track"><div class="prog-fill" id="progFill"></div></div></div>
+    <div class="brand"><i></i>Moving Man</div>
+  </header>
+
+  <main>
+    <!-- WELCOME -->
+    <section data-step="welcome" class="on" style="padding-top:32px;gap:22px">
+      <div class="brand" style="font-size:16px"><i style="width:10px;height:10px;border-radius:5px"></i>Moving Man</div>
+      <div class="hero">
+        <div class="k mono">KIGALI DELIVERY</div>
+        <h1>Send a parcel across Kigali</h1>
+        <p>Drop two pins, see your price, confirm on WhatsApp. It takes about a minute.</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Your price first.</b> Just the two locations, no personal details.</div></div>
+        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div><b>Riders who speak English</b> and follow the map.</div></div>
+        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><div><b>Nothing to pay now.</b> You confirm with us on WhatsApp.</div></div>
+      </div>
+      <p class="sub" style="font-size:13.5px">Prefer to chat? Send both location pins on WhatsApp and we'll quote you there.</p>
+    </section>
+
+    <!-- PICKUP / DROP-OFF (shared screen) -->
+    <section data-step="loc">
+      <div><h1 id="locTitle">Where are we picking up?</h1><p class="sub" id="locSub"></p></div>
+      <div class="grid2">
+        <button class="ghost" id="gpsBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span id="gpsLabel">My location</span></button>
+        <button class="ghost" id="pasteBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Paste a link</button>
+      </div>
+      <div id="pasteBox" hidden style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px">
+        <label class="lbl" for="pasteInput" style="margin:0">Google Maps link, plus code or coordinates</label>
+        <input id="pasteInput" class="inp" type="text" inputmode="url" autocomplete="off" placeholder="maps.app.goo.gl/…  or  34CR+9R4 Kigali">
+        <button class="ghost dark" id="pasteUse">Use this location</button>
+        <p class="err" id="pasteErr"></p>
+      </div>
+      <div class="search">
+        <label class="sr" for="searchInput">Search a place or landmark</label>
+        <input id="searchInput" class="inp" type="search" autocomplete="off" placeholder="Search a place or landmark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6258" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </div>
+      <ul class="results" id="results"></ul>
+      <div id="map" aria-label="Map. Tap to drop a pin."></div>
+      <p class="hint">Tap the map to drop a pin. Drag the pin to adjust it.</p>
+      <div class="picked" id="picked" hidden>
+        <div class="picked-row">
+          <div class="badge" id="pickedBadge">A</div>
+          <div style="flex:1;min-width:0"><div class="picked-name" id="pickedName"></div><div class="picked-sub mono" id="pickedSub"></div></div>
+        </div>
+        <div><label class="lbl" for="landmark">Landmark or gate (optional)</label><input id="landmark" class="inp" type="text" maxlength="140" placeholder="e.g. black gate opposite the pharmacy"></div>
+      </div>
+      <p class="note" id="gpsNote" hidden></p>
+      <p class="note grey" id="dropTip" hidden><b>Don't know the exact spot?</b> Pin the area, then add a landmark. The rider will call the receiver.</p>
+      <p class="err" id="locErr"></p>
+    </section>
+
+    <!-- SIZE -->
+    <section data-step="size">
+      <div><h1>How big is it?</h1><p class="sub">So we send the right rider. Pick the closest one.</p></div>
+      <button class="opt" data-size="Small"><span class="tag mono">S</span><span><b>Fits in a bag</b><small>Documents, keys, a phone, a food order</small></span></button>
+      <button class="opt" data-size="Medium"><span class="tag mono">M</span><span><b>A box you can carry</b><small>Shoes, groceries, laundry, small electronics</small></span></button>
+      <button class="opt" data-size="Large"><span class="tag mono">L</span><span><b>Too big to carry alone</b><small>Furniture, appliances, bulk stock</small></span></button>
+      <p class="note" id="largeNote" hidden>Our riders are on bikes for now. For bigger items, message us on WhatsApp and we'll see what we can arrange.</p>
+      <p class="err" id="sizeErr"></p>
+    </section>
+
+    <!-- PRICE -->
+    <section data-step="price">
+      <div id="priceBox"></div>
+      <div id="whenBox">
+        <div class="lbl">When should we pick it up?</div>
+        <div class="chips"><button class="chip on" data-when="now">As soon as possible</button><button class="chip" data-when="later">Schedule</button></div>
+        <div id="laterBox" hidden style="margin-top:12px"><label class="lbl" for="whenAt">Pickup date and time</label><input id="whenAt" class="inp" type="datetime-local"></div>
+        <p class="err" id="whenErr"></p>
+      </div>
+    </section>
+
+    <!-- HANDOVER -->
+    <section data-step="handover">
+      <div><h1>Who's handing it over?</h1><p class="sub">The rider calls this person when they arrive at the pickup point.</p></div>
+      <button class="opt" data-handover="me"><span><b>Me</b><small>I'll be at the pickup point</small></span></button>
+      <button class="opt" data-handover="other"><span><b>Someone else</b><small>A shop, colleague or friend</small></span></button>
+      <div id="meFields" hidden style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lbl" for="meName">Your name or business</label><input id="meName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><p class="err" data-err="meName"></p></div>
+        <div><label class="lbl" for="mePhone">Your WhatsApp number</label><input id="mePhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><p class="err" data-err="mePhone"></p></div>
+      </div>
+      <div id="otherFields" hidden style="display:flex;flex-direction:column;gap:14px">
+        <div><label class="lbl" for="sName">Their name</label><input id="sName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><p class="err" data-err="sName"></p></div>
+        <div><label class="lbl" for="sPhone">Their phone number</label><input id="sPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><p class="err" data-err="sPhone"></p></div>
+      </div>
+      <p class="err" id="handErr"></p>
+    </section>
+
+    <!-- RECEIVER -->
+    <section data-step="receiver">
+      <div><h1>Who's receiving it?</h1><p class="sub">We only use this number for this delivery.</p></div>
+      <button class="ghost" id="contactBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Pick from contacts</button>
+      <div><label class="lbl" for="rName">Receiver's name</label><input id="rName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><p class="err" data-err="rName"></p></div>
+      <div><label class="lbl" for="rPhone">Receiver's phone number</label><input id="rPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><p class="err" data-err="rPhone"></p></div>
+    </section>
+
+    <!-- YOU (only when someone else hands over) -->
+    <section data-step="you">
+      <div><h1>And how do we reach you?</h1><p class="sub">We'll confirm the order and send the rider's details here.</p></div>
+      <div><label class="lbl" for="yName">Your name or business</label><input id="yName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><p class="err" data-err="yName"></p></div>
+      <div><label class="lbl" for="yPhone">Your WhatsApp number</label><input id="yPhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><p class="err" data-err="yPhone"></p></div>
+    </section>
+
+    <!-- DETAILS (optional) -->
+    <section data-step="details">
+      <div><h1>Anything the rider should know?</h1><p class="sub">Optional. It helps us handle it properly.</p></div>
+      <div><div class="lbl">What is it?</div><div class="chips" data-group="item"><button class="chip">Food</button><button class="chip">Documents</button><button class="chip">Clothes</button><button class="chip">Laundry</button><button class="chip">Electronics</button><button class="chip">Other</button></div></div>
+      <div><div class="lbl">Roughly how heavy?</div><div class="chips" data-group="weight"><button class="chip">Under 2 kg</button><button class="chip">2–5 kg</button><button class="chip">5–10 kg</button><button class="chip">Over 10 kg</button></div></div>
+      <button class="opt" id="fragileBtn" aria-pressed="false" style="min-height:56px"><span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" s
