@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#16130F">
 <title>Book a delivery · Moving Man</title>
-<meta name="description" content="Drop two pins, see your price, confirm on WhatsApp.">
+<meta name="description" content="Bike delivery across Kigali. Set two pins, see your price, confirm on WhatsApp.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
@@ -13,98 +13,146 @@
 <style>
   :root{
     --ink:#16130F; --ink2:#3F3A34; --muted:#5B544C; --line:#D8D0C4; --soft:#EEE8DE;
-    --bg:#F5F1EA; --card:#FFFFFF; --accent:#B93C14; --accent-d:#8F2E0F; --bad:#B42318; --warn-bg:#FEF0D6; --warn:#6B3A03;
+    --bg:#F5F1EA; --card:#FFFFFF; --accent:#B93C14; --bad:#B42318; --ok:#1E7B4F; --warn-bg:#FEF0D6; --warn:#6B3A03;
   }
   *{box-sizing:border-box}
   [hidden]{display:none !important}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',system-ui,-apple-system,Segoe UI,sans-serif;-webkit-text-size-adjust:100%}
-  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font-family:'Instrument Sans',system-ui,-apple-system,Segoe UI,sans-serif;-webkit-text-size-adjust:100%}
+  button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;color:inherit}
   .mono{font-family:'IBM Plex Mono',ui-monospace,monospace}
-  .app{max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
-  .top{position:sticky;top:0;z-index:1000;background:var(--bg);height:64px;display:flex;align-items:center;gap:12px;padding:0 16px}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative}
+
+  /* header */
+  .top{position:sticky;top:0;z-index:1000;background:var(--bg);padding:12px 16px 8px;display:flex;flex-direction:column;gap:10px}
+  .top-row{display:flex;align-items:center;gap:10px;min-height:44px}
   .icon-btn{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;padding:0;flex:none}
-  .prog{flex:1;display:flex;flex-direction:column;gap:6px}
-  .prog-label{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:600}
-  .prog-track{height:6px;background:#E3DCD0;border-radius:3px;overflow:hidden}
-  .prog-fill{height:6px;background:var(--accent);border-radius:3px;width:0;transition:width .25s ease}
-  .brand{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
-  .brand i{width:8px;height:8px;border-radius:4px;background:var(--accent);display:inline-block}
-  main{flex:1;padding:4px 20px 24px}
-  section{display:none;flex-direction:column;gap:16px}
-  section.on{display:flex;animation:in .2s ease}
-  @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  h1{margin:0;font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
-  .sub{margin:6px 0 0;font-size:15px;line-height:1.45;color:var(--muted)}
-  .bar{position:sticky;bottom:0;z-index:1000;background:var(--bg);border-top:1px solid #E3DCD0;padding:12px 20px calc(18px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:6px}
-  .cta{width:100%;height:54px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:17px;font-weight:600;transition:transform .12s ease,opacity .15s}
-  .cta:active{transform:scale(.98)} .cta[disabled]{opacity:.55}
-  .cta.dark{background:var(--ink)}
-  .link-btn{border:0;background:transparent;font-size:15px;font-weight:600;color:var(--ink2);min-height:44px}
-  .bar-note{margin:0;text-align:center;font-size:12.5px;color:var(--muted)}
-  .ghost{min-height:46px;border:1.5px solid var(--line);background:var(--card);border-radius:12px;font-size:14.5px;font-weight:600;color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 12px}
-  .ghost.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  label.lbl,.lbl{font-size:13.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
-  .inp{width:100%;height:52px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:17px;background:var(--card);color:var(--ink);font-family:inherit;outline:none;-webkit-appearance:none}
+  .brand{font-size:15px;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap;flex:1}
+  .brand i{width:9px;height:9px;border-radius:5px;background:var(--accent);display:inline-block}
+  .stepno{font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  .segs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .seg-t{display:flex;flex-direction:column;gap:5px}
+  .seg-track{height:5px;border-radius:3px;background:#DDD5C9;overflow:hidden}
+  .seg-fill{height:5px;border-radius:3px;background:var(--accent);width:0;transition:width .45s cubic-bezier(.3,.7,.2,1)}
+  .seg-l{font-size:10.5px;letter-spacing:.06em;font-weight:600;color:#8F867B}
+  .seg-t.on .seg-l{color:var(--ink)}
+
+  main{flex:1;padding:6px 20px 24px}
+  section{display:none;flex-direction:column;gap:14px}
+  section.on{display:flex}
+  h1{margin:0;font-size:25px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+  .sub{margin:4px 0 0;font-size:15px;line-height:1.45;color:var(--muted)}
+  .lbl{font-size:13.5px;font-weight:600;color:var(--ink2);display:block;margin-bottom:6px}
+  .inp{width:100%;height:50px;border:1.5px solid var(--line);border-radius:12px;padding:0 14px;font-size:16.5px;background:var(--card);color:var(--ink);font-family:inherit;outline:none;-webkit-appearance:none}
   .inp:focus{border-color:var(--ink)} .inp.bad{border-color:var(--bad)}
-  textarea.inp{height:88px;padding:12px 14px;resize:none;line-height:1.4}
+  textarea.inp{height:84px;padding:12px 14px;resize:none;line-height:1.4}
   .err{font-size:13.5px;color:var(--bad);margin:6px 0 0;line-height:1.35}
   .err:empty{display:none}
-  .note{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45}
-  .note.grey{background:#EDE7DD;color:var(--ink2)}
-  .opt{width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:center;min-height:68px;color:var(--ink)}
-  .opt.on{border:2px solid var(--ink);box-shadow:0 0 0 4px rgba(185,60,20,.14)}
-  .opt b{display:block;font-size:16.5px} .opt small{display:block;font-size:13.5px;color:var(--muted);margin-top:2px}
-  .tag{width:44px;height:44px;border-radius:12px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+  .note{margin:0;background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:11px 13px;font-size:14px;line-height:1.45}
+  .card{background:var(--card);border:1px solid #DDD5C9;border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:12px}
   .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{min-height:44px;padding:0 16px;border-radius:22px;border:1.5px solid var(--line);background:var(--card);font-size:14.5px;font-weight:500;color:var(--ink)}
+  .chip{min-height:44px;padding:0 15px;border-radius:22px;border:1.5px solid var(--line);background:var(--card);font-size:14.5px;font-weight:500;color:var(--ink);transition:background-color .2s,color .2s,border-color .2s}
   .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .segc{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;background:#EDE7DD;border-radius:12px;padding:4px}
+  .segc button{min-height:44px;border:0;border-radius:9px;background:transparent;font-size:14.5px;font-weight:600;color:var(--ink2);transition:background-color .2s,box-shadow .2s}
+  .segc button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .linkb{border:0;background:transparent;color:var(--ink);font-size:14.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;padding:0 4px;min-height:44px}
+  .edit{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:14.5px;min-height:44px;padding:0 2px;flex:none}
+  .sr{position:absolute;left:-9999px}
+
+  /* step 1: A/B fields */
+  .field{width:100%;min-height:54px;border:1.5px solid transparent;background:#F7F4EF;border-radius:12px;display:flex;align-items:center;gap:10px;padding:6px 10px;text-align:left;transition:border-color .25s,background-color .25s}
+  .field.on{border-color:var(--ink);background:#fff;box-shadow:0 0 0 4px rgba(185,60,20,.12);animation:mmRing .7s ease-out}
+  .field .k{font-size:11px;font-weight:600;letter-spacing:.06em;color:#6B6258;display:block}
+  .field .v{font-size:15.5px;font-weight:600;line-height:1.25;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .field .ph{font-size:15.5px;color:#8F867B;line-height:1.25;display:block}
+  .letter{width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex:none}
+  .conn{position:relative;width:2px;height:12px;margin-left:22px}
+  .conn::before{content:'';position:absolute;left:0;top:0;height:12px;border-left:2px dotted #A39A8E}
+  .conn i{position:absolute;left:0;top:0;width:2px;height:0;background:var(--ink);transition:height .45s cubic-bezier(.3,.7,.2,1)}
+  .conn.on i{height:12px}
+  .okmark{width:22px;height:22px;border-radius:11px;background:var(--ok);display:flex;align-items:center;justify-content:center;flex:none;animation:mmPop .45s cubic-bezier(.2,.8,.3,1.2)}
+  .okin{position:absolute;right:13px;top:14px;pointer-events:none}
+  .inwrap{position:relative} .inwrap .inp{padding-right:44px}
   .search{position:relative}
-  .search svg{position:absolute;left:14px;top:17px;pointer-events:none}
+  .search svg{position:absolute;left:14px;top:16px;pointer-events:none}
   .search .inp{padding-left:42px}
-  .results{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card)}
+  .results{list-style:none;margin:0;padding:0;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
   .results:empty{display:none}
-  .results button{width:100%;text-align:left;background:var(--card);border:0;border-bottom:1px solid var(--soft);padding:10px 14px;min-height:52px;display:flex;flex-direction:column;gap:2px;color:var(--ink)}
+  .results button{width:100%;text-align:left;background:var(--card);border:0;border-bottom:1px solid var(--soft);padding:9px 14px;min-height:50px;display:flex;flex-direction:column;gap:1px}
   .results li:last-child button{border-bottom:0}
-  .results b{font-size:15.5px} .results small{font-size:13px;color:var(--muted)}
-  .results .empty{padding:14px;font-size:14px;color:var(--muted)}
-  #map{width:100%;height:260px;border-radius:16px;border:1.5px solid var(--line);overflow:hidden;background:#E8E2D6;z-index:0}
-  .hint{font-size:13px;color:var(--muted);margin:-8px 0 0}
+  .results b{font-size:15px} .results small{font-size:12.5px;color:var(--muted)}
+  .results .empty{padding:12px 14px;font-size:13.5px;color:var(--muted)}
+  .mapwrap{position:relative}
+  #map{width:100%;height:230px;border-radius:16px;border:1.5px solid var(--line);overflow:hidden;background:#E8E2D6;z-index:0}
+  .maptag{position:absolute;left:8px;bottom:8px;z-index:500;font-size:10.5px;font-weight:600;background:rgba(255,255,255,.92);padding:3px 7px;border-radius:6px;color:var(--ink2);pointer-events:none}
+  .pinwrap{position:relative;width:30px;height:30px}
+  .pinwrap.drop{animation:mmDrop .55s cubic-bezier(.2,.8,.3,1)}
+  .pinwrap.drop::after{content:'';position:absolute;left:2px;bottom:-6px;width:26px;height:10px;border-radius:50%;background:var(--c);opacity:0;animation:mmRipple .8s ease-out .25s}
   .pin{width:30px;height:30px;border-radius:15px 15px 15px 2px;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center}
   .pin span{transform:rotate(45deg);color:#fff;font-weight:700;font-size:12px}
-  .picked{background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:12px}
-  .picked-row{display:flex;gap:12px;align-items:center}
-  .badge{width:36px;height:36px;border-radius:18px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
-  .picked-name{font-size:16.5px;font-weight:700} .picked-sub{font-size:13px;color:var(--muted)}
-  .price{background:var(--ink);color:#F5F1EA;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:10px}
-  .price .k{font-size:12px;letter-spacing:.1em;color:#F08A63;font-weight:600}
-  .price .v{font-size:46px;font-weight:700;letter-spacing:-.02em;line-height:1}
-  .price .m{font-size:15px;color:#D9D0C4}
-  .route{display:flex;flex-direction:column;gap:6px;margin-top:6px;padding-top:12px;border-top:1px solid #3A342E;font-size:14.5px}
-  .route div{display:flex;gap:10px;align-items:center}
-  .dot{width:20px;height:20px;border-radius:10px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
-  .table{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 16px}
-  .row{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;padding:10px 0;border-bottom:1px solid var(--soft)}
-  .row:last-child{border-bottom:0} .row.total{font-weight:700}
-  .skeleton{height:170px;border-radius:22px;background:linear-gradient(90deg,#E8E1D5 0%,#F1ECE3 50%,#E8E1D5 100%);background-size:200% 100%;animation:sk 1.2s infinite}
+  .mm-route{stroke-dasharray:1 1;stroke-dashoffset:1;animation:mmDash 1.1s cubic-bezier(.4,.1,.2,1) forwards}
+  .mm-route.drawn{stroke-dasharray:none;animation:none}
+
+  /* step 2 */
+  .cardhead{display:flex;align-items:center;gap:10px}
+  .cardhead .t{display:flex;flex-direction:column;flex:1;min-width:0}
+  .cardhead .k{font-size:11px;font-weight:600;letter-spacing:.06em;color:#6B6258}
+  .cardhead .n{font-size:14.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--ok);background:#E3F1E8;border-radius:12px;padding:3px 9px 3px 4px;animation:mmPop .45s cubic-bezier(.2,.8,.3,1.2)}
+  .badge .okmark{width:16px;height:16px;animation:none}
+
+  /* step 3 */
+  .sumrow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--soft)}
+  .sumrow:last-child{border-bottom:0}
+  .sumrow .t{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+  .sumrow .v{font-size:15px;font-weight:600;overflow-wrap:anywhere}
+  .sumrow .s{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+  .acc{border:0;background:transparent;min-height:54px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;text-align:left;width:100%}
+  .row{display:flex;justify-content:space-between;gap:12px;font-size:14px;padding:8px 0;border-bottom:1px solid var(--soft)}
+  .row:last-child{border-bottom:0}
+
+  /* welcome */
+  .hero{background:var(--ink);color:#F5F1EA;border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px}
+  .hero h1{font-size:31px;line-height:1.1;letter-spacing:-.02em}
+  .hero p{margin:0;font-size:15.5px;line-height:1.45;color:#D9D0C4}
+  .how{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid #E3DCD0}
+  .how .n{width:30px;height:30px;border-radius:15px;background:#fff;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex:none}
+  .how b{display:block;font-size:15.5px} .how small{display:block;font-size:13.5px;color:var(--muted)}
+
+  /* done */
+  .done{padding-top:28px}
+  .big{width:64px;height:64px;border-radius:32px;background:var(--ink);display:flex;align-items:center;justify-content:center;animation:mmPop .5s cubic-bezier(.2,.8,.3,1.2)}
+
+  /* bottom bar + toast */
+  .bar{position:sticky;bottom:0;z-index:1000;background:#fff;border-top:1px solid #E3DCD0;padding:12px 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:4px}
+  .barrow{display:flex;align-items:center;gap:12px;min-height:54px}
+  .barinfo{flex:1;min-width:0;display:flex;flex-direction:column}
+  .barprice{font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.1}
+  .barsub{font-size:12.5px;color:var(--muted)}
+  .barwait{font-size:13.5px;line-height:1.35;color:var(--muted)}
+  .cta{height:52px;border:0;border-radius:14px;background:var(--accent);color:#fff;font-size:16.5px;font-weight:600;padding:0 20px;flex:none;transition:transform .12s ease,background-color .2s,opacity .2s}
+  .cta:active{transform:scale(.98)}
+  .cta.off{background:#CFC6B9}
+  .cta.full{width:100%}
+  #confirmBtn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;padding:0 12px}
+  .cta.dark{background:var(--ink)}
+  .skel{height:22px;width:130px;border-radius:6px;background:linear-gradient(90deg,#E8E1D5 0%,#F3EEE6 50%,#E8E1D5 100%);background-size:200% 100%;animation:sk 1.2s infinite}
+  .toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));z-index:1100;transform:translateX(-50%);background:var(--ink);color:#F5F1EA;border-radius:22px;padding:10px 16px 10px 10px;display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;white-space:nowrap;max-width:calc(100% - 32px);box-shadow:0 8px 24px rgba(22,19,15,.25);pointer-events:none;opacity:0;transition:opacity .25s}
+  .toast.show{opacity:1;animation:mmToast .35s cubic-bezier(.2,.8,.2,1)}
+  .toast span.txt{overflow:hidden;text-overflow:ellipsis}
+
+  /* motion */
+  @keyframes mmPop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.18);opacity:1}100%{transform:scale(1)}}
+  @keyframes mmUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes mmToast{0%{transform:translate(-50%,14px) scale(.96)}100%{transform:translate(-50%,0) scale(1)}}
+  @keyframes mmRing{0%{box-shadow:0 0 0 0 rgba(185,60,20,.5)}70%{box-shadow:0 0 0 12px rgba(185,60,20,0)}100%{box-shadow:0 0 0 4px rgba(185,60,20,.12)}}
+  @keyframes mmDrop{0%{transform:translateY(-30px);opacity:0}55%{transform:translateY(2px);opacity:1}75%{transform:translateY(-4px)}100%{transform:none}}
+  @keyframes mmRipple{0%{transform:scale(.4);opacity:.5}100%{transform:scale(2.4);opacity:0}}
+  @keyframes mmDash{to{stroke-dashoffset:0}}
+  @keyframes mmFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   @keyframes sk{from{background-position:200% 0}to{background-position:-200% 0}}
-  .review-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--soft)}
-  .review-row div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-  .review-row .k{font-size:11px;letter-spacing:.08em;color:#6B6258;font-weight:600}
-  .review-row .v{font-size:15.5px;font-weight:600;overflow-wrap:anywhere}
-  .review-row .s{font-size:13.5px;color:var(--muted);overflow-wrap:anywhere}
-  .review-row button{border:0;background:transparent;color:var(--accent);font-weight:600;font-size:14.5px;min-height:44px;padding:0 4px}
-  .hero{background:var(--ink);color:#F5F1EA;border-radius:22px;padding:26px 22px;display:flex;flex-direction:column;gap:12px}
-  .hero .k{font-size:12px;letter-spacing:.1em;color:#F08A63;font-weight:600}
-  .hero h1{font-size:32px;line-height:1.1;letter-spacing:-.02em}
-  .hero p{margin:0;font-size:16px;line-height:1.45;color:#D9D0C4}
-  .perk{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.4}
-  .perk svg{flex:none;margin-top:1px}
-  .check{width:26px;height:26px;border-radius:7px;border:2px solid var(--ink);background:#fff;display:flex;align-items:center;justify-content:center;flex:none}
-  .opt.on .check{background:var(--ink)}
-  .done{align-items:stretch;text-align:left;padding-top:28px}
-  .done .big{width:64px;height:64px;border-radius:32px;background:var(--ink);display:flex;align-items:center;justify-content:center}
-  .sr{position:absolute;left:-9999px}
+  .enter{animation:mmUp .42s cubic-bezier(.2,.8,.2,1) both}
+  @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important}.mm-route{stroke-dasharray:none}}
   .leaflet-control-attribution{font-size:10px}
 </style>
 </head>
@@ -112,157 +160,196 @@
 <div class="app">
 
   <header class="top" id="top" hidden>
-    <button class="icon-btn" id="backBtn" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
-    <div class="prog"><div class="prog-label mono" id="progLabel">STEP 1 OF 8</div><div class="prog-track"><div class="prog-fill" id="progFill"></div></div></div>
-    <div class="brand"><i></i>Moving Man</div>
+    <div class="top-row">
+      <button class="icon-btn" id="backBtn" aria-label="Back"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg></button>
+      <div class="brand"><i></i>Moving Man</div>
+      <div class="stepno mono" id="stepNo">STEP 1 OF 3</div>
+    </div>
+    <div class="segs" aria-hidden="true">
+      <div class="seg-t" data-seg="0"><div class="seg-track"><div class="seg-fill"></div></div><span class="seg-l mono">WHERE</span></div>
+      <div class="seg-t" data-seg="1"><div class="seg-track"><div class="seg-fill"></div></div><span class="seg-l mono">WHO</span></div>
+      <div class="seg-t" data-seg="2"><div class="seg-track"><div class="seg-fill"></div></div><span class="seg-l mono">CONFIRM</span></div>
+    </div>
   </header>
 
   <main>
     <!-- WELCOME -->
-    <section data-step="welcome" class="on" style="padding-top:32px;gap:22px">
-      <div class="brand" style="font-size:16px"><i style="width:10px;height:10px;border-radius:5px"></i>Moving Man</div>
-      <div class="hero">
-        <div class="k mono">KIGALI DELIVERY</div>
-        <h1>Send a parcel across Kigali</h1>
-        <p>Drop two pins, see your price, confirm on WhatsApp. It takes about a minute.</p>
+    <section data-step="welcome" class="on" style="padding-top:26px;gap:20px">
+      <div class="brand enter" style="font-size:16px;flex:none"><i style="width:10px;height:10px"></i>Moving Man</div>
+      <div class="hero enter" style="animation-delay:.06s">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div class="mono" style="font-size:12px;letter-spacing:.1em;color:#F08A63;font-weight:600">KIGALI DELIVERY</div>
+          <svg width="104" height="44" viewBox="0 0 120 52" fill="none" aria-hidden="true" style="flex:none">
+            <path d="M12 40 C38 40 42 12 74 12 C90 12 96 20 106 20" stroke="#5B544C" stroke-width="2.5" stroke-dasharray="5 6" stroke-linecap="round"/>
+            <circle cx="12" cy="40" r="9" fill="#F5F1EA"/><text x="12" y="44" text-anchor="middle" font-size="10" font-weight="700" fill="#16130F" font-family="Instrument Sans, sans-serif">A</text>
+            <g style="animation:mmFloat 2.4s ease-in-out infinite"><circle cx="106" cy="20" r="9" fill="#B93C14"/><text x="106" y="24" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Instrument Sans, sans-serif">B</text></g>
+          </svg>
+        </div>
+        <h1 id="welcomeTitle">Send a parcel across Kigali</h1>
+        <p>Bike delivery across Kigali. Set two pins, see your price, confirm on WhatsApp. About a minute.</p>
       </div>
-      <div style="display:flex;flex-direction:column;gap:14px">
-        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div><b>Your price first.</b> Just the two locations, no personal details.</div></div>
-        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><div><b>Riders who speak English</b> and follow the map.</div></div>
-        <div class="perk"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg><div><b>Nothing to pay now.</b> You confirm with us on WhatsApp.</div></div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <div class="mono enter" style="animation-delay:.12s;font-size:11.5px;letter-spacing:.08em;color:var(--muted);font-weight:600;margin-bottom:6px">HOW IT WORKS · 3 STEPS</div>
+        <div class="how enter" style="animation-delay:.18s"><span class="n mono">1</span><div><b>Where</b><small>Pickup, drop-off and size. Price shows instantly.</small></div></div>
+        <div class="how enter" style="animation-delay:.24s"><span class="n mono">2</span><div><b>Who</b><small>Names and numbers at each end.</small></div></div>
+        <div class="how enter" style="animation-delay:.30s"><span class="n mono">3</span><div><b>Confirm</b><small>Check it over and send on WhatsApp.</small></div></div>
       </div>
-      <p class="sub" style="font-size:13.5px">Prefer to chat? Send both location pins on WhatsApp and we'll quote you there.</p>
+      <p class="sub enter" style="animation-delay:.36s;font-size:13.5px;margin:0">Your price shows before we ask for any contact details. Nothing to pay now.</p>
     </section>
 
-    <!-- PICKUP / DROP-OFF (shared screen) -->
-    <section data-step="loc">
-      <div><h1 id="locTitle">Where are we picking up?</h1><p class="sub" id="locSub"></p></div>
-      <div class="grid2">
-        <button class="ghost" id="gpsBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span id="gpsLabel">My location</span></button>
-        <button class="ghost" id="pasteBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Paste a link</button>
+    <!-- STEP 1: WHERE -->
+    <section data-step="route">
+      <div><h1>Where are we going?</h1><p class="sub">Two pins and a size. Your price shows up straight away.</p></div>
+
+      <div class="card" style="gap:6px;padding:10px">
+        <button class="field" id="fieldA" data-pt="pickup">
+          <span class="letter" style="background:#16130F">A</span>
+          <span style="flex:1;min-width:0"><span class="k mono">PICKUP</span><span class="v" id="nameA" hidden></span><span class="ph" id="phA">Where do we collect it?</span></span>
+          <span id="okA" hidden></span>
+        </button>
+        <div class="conn" id="conn"><i></i></div>
+        <button class="field" id="fieldB" data-pt="drop">
+          <span class="letter" style="background:#B93C14">B</span>
+          <span style="flex:1;min-width:0"><span class="k mono">DROP-OFF</span><span class="v" id="nameB" hidden></span><span class="ph" id="phB">Where is it going?</span></span>
+          <span id="okB" hidden></span>
+        </button>
       </div>
-      <div id="pasteBox" hidden style="background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px">
-        <label class="lbl" for="pasteInput" style="margin:0">Google Maps link, plus code or coordinates</label>
-        <input id="pasteInput" class="inp" type="text" inputmode="url" autocomplete="off" placeholder="maps.app.goo.gl/…  or  34CR+9R4 Kigali">
-        <button class="ghost dark" id="pasteUse">Use this location</button>
-        <p class="err" id="pasteErr"></p>
-      </div>
+
       <div class="search">
         <label class="sr" for="searchInput">Search a place or landmark</label>
-        <input id="searchInput" class="inp" type="search" autocomplete="off" placeholder="Search a place or landmark">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B6258" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="searchInput" class="inp" type="search" autocomplete="off" placeholder="Search pickup: place or landmark">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#6B6258" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
       </div>
       <ul class="results" id="results"></ul>
-      <div id="map" aria-label="Map. Tap to drop a pin."></div>
-      <p class="hint">Tap the map to drop a pin. Drag the pin to adjust it.</p>
-      <div class="picked" id="picked" hidden>
-        <div class="picked-row">
-          <div class="badge" id="pickedBadge">A</div>
-          <div style="flex:1;min-width:0"><div class="picked-name" id="pickedName"></div><div class="picked-sub mono" id="pickedSub"></div></div>
-        </div>
-        <div><label class="lbl" for="landmark">Landmark or gate (optional)</label><input id="landmark" class="inp" type="text" maxlength="140" placeholder="e.g. black gate opposite the pharmacy"></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:-6px">
+        <button class="linkb" id="gpsBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg><span id="gpsLabel">Use my location</span></button>
+        <button class="linkb" id="pasteBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B93C14" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>Paste a link or plus code</button>
+      </div>
+      <div class="card enter" id="pasteBox" hidden style="padding:10px;gap:8px">
+        <label class="sr" for="pasteInput">Google Maps link, plus code or coordinates</label>
+        <input id="pasteInput" class="inp" type="text" inputmode="url" autocomplete="off" placeholder="maps.app.goo.gl/…  or  34CR+9R4 Kigali">
+        <button class="chip on" id="pasteUse" style="border-radius:12px">Use this location</button>
+        <p class="err" id="pasteErr" style="margin:0"></p>
+      </div>
+      <div class="mapwrap">
+        <div id="map" aria-label="Map. Tap to drop a pin."></div>
+        <div class="maptag mono" id="mapTag">TAP TO PLACE A</div>
       </div>
       <p class="note" id="gpsNote" hidden></p>
-      <p class="note grey" id="dropTip" hidden><b>Don't know the exact spot?</b> Pin the area, then add a landmark. The rider will call the receiver.</p>
-      <p class="err" id="locErr"></p>
+      <div id="landmarkBox" class="enter" hidden>
+        <label class="lbl" for="landmark" id="landmarkLbl">Landmark at A (optional)</label>
+        <input id="landmark" class="inp" type="text" maxlength="140" placeholder="e.g. black gate opposite the pharmacy">
+      </div>
+      <p class="err" id="locErr" style="margin:0"></p>
+      <div>
+        <div class="lbl">What are you sending?</div>
+        <div class="chips" id="sizeChips">
+          <button class="chip" data-size="Small">Fits in a bag</button>
+          <button class="chip" data-size="Medium">A box you can carry</button>
+          <button class="chip" data-size="Large">Too big to carry</button>
+        </div>
+        <p class="note enter" id="largeNote" hidden style="margin-top:10px">Our riders are on bikes for now. For bigger items, message us on WhatsApp and we'll see what we can arrange.</p>
+        <p class="err" id="sizeErr"></p>
+      </div>
     </section>
 
-    <!-- SIZE -->
-    <section data-step="size">
-      <div><h1>How big is it?</h1><p class="sub">So we send the right rider. Pick the closest one.</p></div>
-      <button class="opt" data-size="Small"><span class="tag mono">S</span><span><b>Fits in a bag</b><small>Documents, keys, a phone, a food order</small></span></button>
-      <button class="opt" data-size="Medium"><span class="tag mono">M</span><span><b>A box you can carry</b><small>Shoes, groceries, laundry, small electronics</small></span></button>
-      <button class="opt" data-size="Large"><span class="tag mono">L</span><span><b>Too big to carry alone</b><small>Furniture, appliances, bulk stock</small></span></button>
-      <p class="note" id="largeNote" hidden>Our riders are on bikes for now. For bigger items, message us on WhatsApp and we'll see what we can arrange.</p>
-      <p class="err" id="sizeErr"></p>
+    <!-- STEP 2: WHO -->
+    <section data-step="who">
+      <div><h1>Who's involved?</h1><p class="sub">The rider calls these numbers at each end.</p></div>
+      <div class="card">
+        <div class="cardhead"><span class="letter" style="background:#16130F">A</span><div class="t"><span class="k mono">AT PICKUP</span><span class="n" id="whoA"></span></div><span id="badgeP" hidden></span></div>
+        <div class="segc"><button data-handover="me" class="on">I'll hand it over</button><button data-handover="other">Someone else</button></div>
+        <div id="meFields" style="display:flex;flex-direction:column;gap:12px">
+          <div><label class="lbl" for="meName">Your name or business</label><div class="inwrap"><input id="meName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><span class="okin" data-ok="meName" hidden></span></div><p class="err" data-err="meName"></p></div>
+          <div><label class="lbl" for="mePhone">Your WhatsApp number</label><div class="inwrap"><input id="mePhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><span class="okin" data-ok="mePhone" hidden></span></div><p class="err" data-err="mePhone"></p></div>
+        </div>
+        <div id="otherFields" class="enter" hidden style="flex-direction:column;gap:12px">
+          <div><label class="lbl" for="sName">Their name</label><div class="inwrap"><input id="sName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><span class="okin" data-ok="sName" hidden></span></div><p class="err" data-err="sName"></p></div>
+          <div><label class="lbl" for="sPhone">Their phone number</label><div class="inwrap"><input id="sPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><span class="okin" data-ok="sPhone" hidden></span></div><p class="err" data-err="sPhone"></p></div>
+        </div>
+      </div>
+
+      <div class="card enter" id="recvCard" hidden>
+        <div class="cardhead"><span class="letter" style="background:#B93C14">B</span><div class="t"><span class="k mono">RECEIVER</span><span class="n" id="whoB"></span></div><span id="badgeR" hidden></span><button class="linkb" id="contactBtn" hidden style="font-size:13.5px">Contacts</button></div>
+        <div><label class="lbl" for="rName">Receiver's name</label><div class="inwrap"><input id="rName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><span class="okin" data-ok="rName" hidden></span></div><p class="err" data-err="rName"></p></div>
+        <div><label class="lbl" for="rPhone">Receiver's phone number</label><div class="inwrap"><input id="rPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><span class="okin" data-ok="rPhone" hidden></span></div><p class="err" data-err="rPhone"></p></div>
+      </div>
+
+      <div class="card enter" id="youCard" hidden>
+        <div style="display:flex;flex-direction:column"><span class="mono" style="font-size:11px;font-weight:600;letter-spacing:.06em;color:#6B6258">YOU</span><span style="font-size:14px;color:var(--muted)">We confirm the order and send the rider's details here.</span></div>
+        <div><label class="lbl" for="yName">Your name or business</label><div class="inwrap"><input id="yName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><span class="okin" data-ok="yName" hidden></span></div><p class="err" data-err="yName"></p></div>
+        <div><label class="lbl" for="yPhone">Your WhatsApp number</label><div class="inwrap"><input id="yPhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><span class="okin" data-ok="yPhone" hidden></span></div><p class="err" data-err="yPhone"></p></div>
+      </div>
     </section>
 
-    <!-- PRICE -->
-    <section data-step="price">
-      <div id="priceBox"></div>
-      <div id="whenBox">
+    <!-- STEP 3: CONFIRM -->
+    <section data-step="confirm">
+      <div><h1>Check and confirm</h1><p class="sub">Nothing is charged now. You confirm on WhatsApp.</p></div>
+      <div class="card" style="gap:0;padding:4px 14px">
+        <div class="sumrow"><span class="letter" style="background:#16130F">A</span><div class="t"><span class="v" id="sumA"></span><span class="s" id="sumHand"></span></div><button class="edit" data-edit="route">Edit</button></div>
+        <div class="sumrow"><span class="letter" style="background:#B93C14">B</span><div class="t"><span class="v" id="sumB"></span><span class="s" id="sumRecv"></span></div><button class="edit" data-edit="who">Edit</button></div>
+        <div class="sumrow"><span class="letter" style="background:#EDE7DD;color:#16130F">i</span><div class="t"><span class="v" id="sumParcel"></span><span class="s" id="sumYou"></span></div></div>
+      </div>
+      <div>
         <div class="lbl">When should we pick it up?</div>
-        <div class="chips"><button class="chip on" data-when="now">As soon as possible</button><button class="chip" data-when="later">Schedule</button></div>
-        <div id="laterBox" hidden style="margin-top:12px"><label class="lbl" for="whenAt">Pickup date and time</label><input id="whenAt" class="inp" type="datetime-local"></div>
+        <div class="segc"><button data-when="now" class="on">As soon as possible</button><button data-when="later">Schedule</button></div>
+        <div id="laterBox" class="enter" hidden style="margin-top:10px"><label class="lbl" for="whenAt">Pickup date and time</label><input id="whenAt" class="inp" type="datetime-local"></div>
         <p class="err" id="whenErr"></p>
       </div>
-    </section>
-
-    <!-- HANDOVER -->
-    <section data-step="handover">
-      <div><h1>Who's handing it over?</h1><p class="sub">The rider calls this person when they arrive at the pickup point.</p></div>
-      <button class="opt" data-handover="me"><span><b>Me</b><small>I'll be at the pickup point</small></span></button>
-      <button class="opt" data-handover="other"><span><b>Someone else</b><small>A shop, colleague or friend</small></span></button>
-      <div id="meFields" hidden style="display:flex;flex-direction:column;gap:14px">
-        <div><label class="lbl" for="meName">Your name or business</label><input id="meName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><p class="err" data-err="meName"></p></div>
-        <div><label class="lbl" for="mePhone">Your WhatsApp number</label><input id="mePhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><p class="err" data-err="mePhone"></p></div>
+      <div class="card" style="padding:0;gap:0">
+        <button class="acc" id="detailsBtn" aria-expanded="false">
+          <span style="display:flex;flex-direction:column"><span style="font-size:15px;font-weight:600">Add details</span><span style="font-size:12.5px;color:var(--muted)" id="detailsHint">Item, weight, fragile, who pays, notes</span></span>
+          <span style="font-size:13.5px;font-weight:600;color:var(--accent)" id="detailsToggle">Optional</span>
+        </button>
+        <div id="detailsBody" class="enter" hidden style="padding:4px 14px 14px;flex-direction:column;gap:14px;border-top:1px solid var(--soft)">
+          <div><div class="lbl" style="margin-top:10px">What is it?</div><div class="chips" data-group="item"><button class="chip">Food</button><button class="chip">Documents</button><button class="chip">Clothes</button><button class="chip">Laundry</button><button class="chip">Electronics</button><button class="chip">Other</button></div></div>
+          <div><div class="lbl">Roughly how heavy?</div><div class="chips" data-group="weight"><button class="chip">Under 2 kg</button><button class="chip">2–5 kg</button><button class="chip">5–10 kg</button><button class="chip">Over 10 kg</button></div></div>
+          <div class="chips"><button class="chip" id="fragileBtn" aria-pressed="false">Fragile, handle with care</button></div>
+          <div><div class="lbl">Who pays for delivery?</div><div class="chips"><span class="chips" data-group="payer"><button class="chip">Sender</button><button class="chip">Receiver</button></span><span style="width:6px"></span><span class="chips" data-group="payMethod"><button class="chip">MoMo</button><button class="chip">Cash</button></span></div></div>
+          <div><label class="lbl" for="notes">Notes for the rider</label><textarea id="notes" class="inp" maxlength="300" placeholder="e.g. call when you're at the gate"></textarea></div>
+        </div>
       </div>
-      <div id="otherFields" hidden style="display:flex;flex-direction:column;gap:14px">
-        <div><label class="lbl" for="sName">Their name</label><input id="sName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><p class="err" data-err="sName"></p></div>
-        <div><label class="lbl" for="sPhone">Their phone number</label><input id="sPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><p class="err" data-err="sPhone"></p></div>
+      <div class="card" style="gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:700">Delivery fee</span><span style="font-size:24px;font-weight:700" id="feeBig"></span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span style="font-size:13px;color:var(--muted)" id="feeSub"></span><button class="edit" id="breakBtn" style="font-size:13.5px">How it’s calculated</button></div>
+        <div id="breakBox" class="enter" hidden style="border-top:1px solid var(--soft)"></div>
       </div>
-      <p class="err" id="handErr"></p>
-    </section>
-
-    <!-- RECEIVER -->
-    <section data-step="receiver">
-      <div><h1>Who's receiving it?</h1><p class="sub">We only use this number for this delivery.</p></div>
-      <button class="ghost" id="contactBtn" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Pick from contacts</button>
-      <div><label class="lbl" for="rName">Receiver's name</label><input id="rName" class="inp" type="text" maxlength="60" placeholder="Who the rider asks for"><p class="err" data-err="rName"></p></div>
-      <div><label class="lbl" for="rPhone">Receiver's phone number</label><input id="rPhone" class="inp" type="tel" inputmode="tel" placeholder="078 123 4567"><p class="err" data-err="rPhone"></p></div>
-    </section>
-
-    <!-- YOU (only when someone else hands over) -->
-    <section data-step="you">
-      <div><h1>And how do we reach you?</h1><p class="sub">We'll confirm the order and send the rider's details here.</p></div>
-      <div><label class="lbl" for="yName">Your name or business</label><input id="yName" class="inp" type="text" autocomplete="name" maxlength="60" placeholder="Full name or business"><p class="err" data-err="yName"></p></div>
-      <div><label class="lbl" for="yPhone">Your WhatsApp number</label><input id="yPhone" class="inp" type="tel" inputmode="tel" autocomplete="tel" placeholder="078 123 4567"><p class="err" data-err="yPhone"></p></div>
-    </section>
-
-    <!-- DETAILS (optional) -->
-    <section data-step="details">
-      <div><h1>Anything the rider should know?</h1><p class="sub">Optional. It helps us handle it properly.</p></div>
-      <div><div class="lbl">What is it?</div><div class="chips" data-group="item"><button class="chip">Food</button><button class="chip">Documents</button><button class="chip">Clothes</button><button class="chip">Laundry</button><button class="chip">Electronics</button><button class="chip">Other</button></div></div>
-      <div><div class="lbl">Roughly how heavy?</div><div class="chips" data-group="weight"><button class="chip">Under 2 kg</button><button class="chip">2–5 kg</button><button class="chip">5–10 kg</button><button class="chip">Over 10 kg</button></div></div>
-      <button class="opt" id="fragileBtn" aria-pressed="false" style="min-height:56px"><span class="check"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span><b>Fragile, handle with care</b><small>Kept upright, carried separately</small></span></button>
-      <div><div class="lbl">Who pays for delivery?</div><div class="chips" data-group="payer"><button class="chip">Sender</button><button class="chip">Receiver</button></div></div>
-      <div><div class="lbl">How?</div><div class="chips" data-group="payMethod"><button class="chip">MoMo</button><button class="chip">Cash</button></div></div>
-      <div><label class="lbl" for="notes">Notes for the rider</label><textarea id="notes" class="inp" maxlength="300" placeholder="e.g. call when you're at the gate"></textarea></div>
-    </section>
-
-    <!-- REVIEW -->
-    <section data-step="review">
-      <div><h1>Check and confirm</h1><p class="sub">Tap Edit to change anything.</p></div>
-      <div class="table" id="reviewList"></div>
-      <p class="sub" style="font-size:13.5px;margin:0">Confirming saves your order and opens WhatsApp with it typed out. Send that message and we'll assign a rider. Nothing is charged yet.</p>
-      <p class="err" id="sendErr"></p>
+      <p class="err" id="sendErr" style="margin:0"></p>
     </section>
 
     <!-- DONE -->
     <section data-step="done" class="done">
       <div class="big"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></div>
-      <h1 id="doneTitle">Order received</h1>
-      <p class="sub" id="doneSub" style="margin:0">WhatsApp should open with your order. Press send so we can assign a rider.</p>
-      <a class="cta" id="waLink" href="#" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Open WhatsApp</a>
-      <button class="ghost" id="againBtn">Book another delivery</button>
+      <h1 id="doneTitle" class="enter">Order received</h1>
+      <p class="sub enter" id="doneSub" style="margin:0">WhatsApp should open with your order. Press send so we can assign a rider.</p>
+      <a class="cta full enter" id="waLink" href="#" style="display:flex;align-items:center;justify-content:center;text-decoration:none">Open WhatsApp</a>
+      <button class="cta full dark enter" id="againBtn">Book another delivery</button>
     </section>
   </main>
 
+  <div class="toast" id="toast" role="status" aria-live="polite"><span class="okmark"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><span class="txt" id="toastTxt"></span></div>
+
   <footer class="bar" id="bar">
-    <button class="cta" id="nextBtn">Get my price</button>
-    <button class="link-btn" id="skipBtn" hidden>Skip this step</button>
-    <p class="bar-note" id="barNote" hidden></p>
+    <div id="barWelcome">
+      <button class="cta full" id="startBtn">Book a delivery</button>
+      <button class="linkb" id="chatBtn" style="width:100%;justify-content:center">Prefer to chat? Message us on WhatsApp</button>
+    </div>
+    <div class="barrow" id="barMain" hidden>
+      <div class="barinfo" id="barInfo"></div>
+      <button class="cta" id="nextBtn">Continue</button>
+    </div>
+    <button class="cta full" id="confirmBtn" hidden>Confirm on WhatsApp</button>
   </footer>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 /* =====================================================================
-   CONFIG — edit these two lines
+   CONFIG
    ===================================================================== */
 var CONFIG = {
   SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx5UplBs9aj-1liiOeWVGEvlHxFvEqeEDbFHVoekW90JN92uq2660fNWZOBq6bLnNOZ/exec',
-  WHATSAPP: '250XXXXXXXXX',                             // business WhatsApp, digits only, e.g. 250795927849
+  WHATSAPP: '250781727394',                             // business WhatsApp, digits only
   CENTER: [-1.9499, 30.0913],                           // Kigali
   BOUNDS: [[-2.10, 29.95], [-1.80, 30.30]]
 };
@@ -270,56 +357,23 @@ var CONFIG = {
 /* ===================================================================== */
 var $ = function (id) { return document.getElementById(id); };
 var S = {
-  step: 'welcome', pickup: null, drop: null, size: '', quote: null, quoteKey: '', quoting: false,
-  when: 'now', whenAt: '', handover: '', sender: { name: '', phone: '' }, receiver: { name: '', phone: '' },
+  step: 'welcome', active: 'pickup', pickup: null, drop: null, size: '',
+  quote: null, quoteKey: '', quoting: false, quoteErr: false, route: null,
+  when: 'now', whenAt: '', handover: 'me', sender: { name: '', phone: '' }, receiver: { name: '', phone: '' },
   customer: { name: '', phone: '' }, details: { item: '', weight: '', fragile: false, payer: '', payMethod: '', notes: '' },
-  orderId: '', sending: false
+  orderId: '', sending: false, tried: false
 };
+var STEPS = ['route', 'who', 'confirm'];
+var CHECK = '<span class="okmark"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>';
+var BADGE = '<span class="badge"><span class="okmark"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span>Done</span>';
 
 /* ---------- storage (returning customers) ---------- */
 function load(k) { try { return JSON.parse(localStorage.getItem('mm_' + k)); } catch (e) { return null; } }
 function save(k, v) { try { localStorage.setItem('mm_' + k, JSON.stringify(v)); } catch (e) {} }
 var saved = load('customer');
-if (saved && saved.name) { S.customer = saved; }
+if (saved && saved.name) S.customer = { name: saved.name, phone: saved.phone || '' };
 
-/* ---------- steps ---------- */
-function seq() {
-  var a = ['welcome', 'pickup', 'drop', 'size', 'price', 'handover', 'receiver'];
-  if (S.handover === 'other') a.push('you');
-  return a.concat(['details', 'review', 'done']);
-}
-var LABELS = { welcome: 'Get my price', pickup: 'Continue', drop: 'Continue', size: 'See my price', price: 'Book this delivery',
-  handover: 'Continue', receiver: 'Continue', you: 'Continue', details: 'Continue', review: 'Confirm on WhatsApp' };
-
-function go(step) {
-  S.step = step;
-  var section = (step === 'pickup' || step === 'drop') ? 'loc' : step;
-  document.querySelectorAll('main section').forEach(function (s) { s.classList.toggle('on', s.dataset.step === section); });
-  var prog = seq().filter(function (x) { return x !== 'welcome' && x !== 'done'; });
-  var i = prog.indexOf(step);
-  $('top').hidden = (step === 'welcome' || step === 'done');
-  $('bar').hidden = (step === 'done');
-  if (i >= 0) { $('progLabel').textContent = 'STEP ' + (i + 1) + ' OF ' + prog.length; $('progFill').style.width = Math.round((i + 1) / prog.length * 100) + '%'; }
-  $('nextBtn').textContent = LABELS[step] || 'Continue';
-  $('nextBtn').disabled = false;
-  $('nextBtn').onclick = null;
-  $('skipBtn').hidden = step !== 'details';
-  $('barNote').hidden = step !== 'price';
-  $('barNote').textContent = 'No payment now. You confirm on WhatsApp.';
-  clearErrors();
-  window.scrollTo(0, 0);
-  if (enter[step]) enter[step]();
-}
-function back() { var a = seq(); var i = a.indexOf(S.step); if (i > 0) go(a[i - 1]); }
-function next() {
-  if (validate[S.step] && !validate[S.step]()) return;
-  if (S.step === 'review') { return submitOrder(); }
-  var a = seq(); go(a[a.indexOf(S.step) + 1]);
-}
-function clearErrors() { document.querySelectorAll('.err').forEach(function (e) { e.textContent = ''; }); document.querySelectorAll('.inp.bad').forEach(function (e) { e.classList.remove('bad'); }); }
-function fieldErr(id, msg) { var p = document.querySelector('[data-err="' + id + '"]'); if (p) p.textContent = msg; $(id).classList.add('bad'); }
-
-/* ---------- phone ---------- */
+/* ---------- helpers ---------- */
 function phone(v) {
   var d = String(v || '').replace(/\D/g, '');
   if (d.indexOf('250') === 0) d = d.slice(3);
@@ -328,6 +382,110 @@ function phone(v) {
   return { ok: ok, local: ok ? '0' + d : '', pretty: ok ? '0' + d.slice(0, 2) + ' ' + d.slice(2, 5) + ' ' + d.slice(5) : String(v || '') };
 }
 var PHONE_ERR = 'Enter a Rwandan mobile number, e.g. 078 123 4567.';
+function nameOk(v) { return String(v || '').trim().length > 1; }
+function fmt(n) { return Number(n).toLocaleString('en-US'); }
+function firstName() { return String(S.customer.name || '').trim().split(' ')[0]; }
+
+/* Short confirmation above the bottom bar for each half of a two-part step. */
+var toastTimer;
+function toast(text) {
+  var t = $('toast');
+  $('toastTxt').textContent = text;
+  t.classList.remove('show'); void t.offsetWidth; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400);
+}
+function hideToast() { clearTimeout(toastTimer); $('toast').classList.remove('show'); }
+
+/* ---------- navigation ---------- */
+function go(step) {
+  S.step = step; S.tried = false;
+  document.querySelectorAll('main section').forEach(function (s) { s.classList.toggle('on', s.dataset.step === step); });
+  $('top').hidden = step === 'welcome' || step === 'done';
+  $('bar').hidden = step === 'done';
+  $('barWelcome').hidden = step !== 'welcome';
+  hideToast(); clearErrors();
+  window.scrollTo(0, 0);
+  if (step === 'welcome') renderWelcome();
+  if (step === 'route') enterRoute();
+  if (step === 'who') enterWho();
+  if (step === 'confirm') enterConfirm();
+  renderBar(); renderProgress();
+}
+function back() {
+  if (S.step === 'confirm') go('who'); else if (S.step === 'who') { saveWho(); go('route'); } else go('welcome');
+}
+function clearErrors() {
+  document.querySelectorAll('.err').forEach(function (e) { e.textContent = ''; });
+  document.querySelectorAll('.inp.bad').forEach(function (e) { e.classList.remove('bad'); });
+}
+function fieldErr(id, msg) { var p = document.querySelector('[data-err="' + id + '"]'); if (p) p.textContent = msg; $(id).classList.add('bad'); }
+
+/* ---------- progress: each bar fills in parts ---------- */
+function whoStatus() {
+  var p = S.handover === 'me' ? (nameOk($('meName').value) && phone($('mePhone').value).ok) : (nameOk($('sName').value) && phone($('sPhone').value).ok);
+  var r = nameOk($('rName').value) && phone($('rPhone').value).ok;
+  var y = S.handover === 'me' ? true : (nameOk($('yName').value) && phone($('yPhone').value).ok);
+  return { p: p, r: r, y: y, all: p && r && y };
+}
+function renderProgress() {
+  var idx = STEPS.indexOf(S.step);
+  if (idx < 0) return;
+  $('stepNo').textContent = 'STEP ' + (idx + 1) + ' OF 3';
+  var routePct = ((S.pickup ? 1 : 0) + (S.drop ? 1 : 0) + (S.size && S.size !== 'Large' ? 1 : 0)) / 3 * 100;
+  var w = whoStatus(), parts = S.handover === 'me' ? [w.p, w.r] : [w.p, w.r, w.y];
+  var whoPct = parts.filter(Boolean).length / parts.length * 100;
+  document.querySelectorAll('.seg-t').forEach(function (el, i) {
+    var pct = i < idx ? 100 : i > idx ? 0 : (i === 0 ? routePct : i === 1 ? whoPct : 100);
+    el.querySelector('.seg-fill').style.width = Math.max(i === idx ? 6 : 0, pct) + '%';
+    el.classList.toggle('on', i <= idx);
+  });
+}
+
+/* ---------- bottom bar ---------- */
+function priceReady() { return !!(S.quote && S.quote.inArea && S.quoteKey === quoteKey() && S.size && S.size !== 'Large'); }
+function renderBar() {
+  var info = $('barInfo'), btn = $('nextBtn');
+  $('barMain').hidden = !(S.step === 'route' || S.step === 'who');
+  $('confirmBtn').hidden = S.step !== 'confirm';
+  if (S.step === 'confirm') { $('confirmBtn').textContent = S.sending ? 'Sending…' : (S.sendFailed ? 'Send on WhatsApp instead' : 'Confirm on WhatsApp · ' + fmt(S.quote.fee) + ' RWF'); $('confirmBtn').disabled = S.sending; return; }
+  if ($('barMain').hidden) return;
+  btn.className = 'cta'; btn.textContent = 'Continue'; btn.dataset.act = 'next';
+  if (priceReady()) {
+    var q = S.quote, wasPrice = info.dataset.mode === 'price';
+    info.innerHTML = '<span class="barprice"></span><span class="barsub"></span>';
+    info.firstChild.textContent = fmt(q.fee) + ' RWF';
+    info.lastChild.textContent = q.km.toFixed(2) + ' km · about ' + q.mins + ' min' + (q.source === 'estimate' ? ' · estimated' : '');
+    if (!wasPrice) { info.classList.remove('enter'); void info.offsetWidth; info.classList.add('enter'); }
+    info.dataset.mode = 'price';
+    return;
+  }
+  info.dataset.mode = 'wait';
+  var msg;
+  if (!S.pickup) msg = 'Set the pickup point to start';
+  else if (!S.drop) msg = 'Now set the drop-off point';
+  else if (S.quote && S.quoteKey === quoteKey() && !S.quote.inArea) { msg = 'Outside Kigali: we’ll quote you on WhatsApp'; btn.textContent = 'Message us'; btn.dataset.act = 'chat'; }
+  else if (S.size === 'Large') { msg = 'Bikes only for now: message us for big items'; btn.textContent = 'Message us'; btn.dataset.act = 'chat'; }
+  else if (S.quoteErr) { msg = 'We couldn’t get a price. Check your connection.'; btn.textContent = 'Try again'; btn.dataset.act = 'retry'; }
+  else if (S.quoting) { info.innerHTML = '<span class="skel" aria-label="Calculating your price"></span><span class="barsub" style="margin-top:4px">Calculating your price…</span>'; btn.classList.add('off'); return; }
+  else if (!S.size) msg = 'Pick a size to see your price';
+  else msg = 'Calculating your price…';
+  info.innerHTML = '<span class="barwait"></span>'; info.firstChild.textContent = msg;
+  if (btn.dataset.act === 'next') btn.classList.add('off');
+}
+
+/* ---------- WELCOME ---------- */
+function renderWelcome() {
+  var f = firstName();
+  $('welcomeTitle').textContent = f ? 'Welcome back, ' + f : 'Send a parcel across Kigali';
+  $('startBtn').textContent = f ? 'Book another delivery' : 'Book a delivery';
+}
+function chatUrl(extra) {
+  var t = 'Hi Moving Man, I’d like to send a parcel.' + (extra ? '\n' + extra : '');
+  return 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(t);
+}
+$('startBtn').addEventListener('click', function () { go('route'); });
+$('chatBtn').addEventListener('click', function () { window.location.href = chatUrl(); });
 
 /* ---------- plus codes (Open Location Code) ---------- */
 var OLC = '23456789CFGHJMPQRVWX';
@@ -352,55 +510,58 @@ function olcRecover(short) {
 }
 function shortPlus(lat, lng) { return olcEncode(lat, lng).slice(4); }
 
-/* ---------- map ---------- */
-var map, mA, mB;
-function pinIcon(letter, color) {
-  return L.divIcon({ className: '', html: '<div class="pin" style="background:' + color + '"><span>' + letter + '</span></div>', iconSize: [30, 30], iconAnchor: [15, 30] });
+/* ---------- STEP 1: map ---------- */
+var map, markers = { pickup: null, drop: null }, routeLine = null;
+var COLORS = { pickup: '#16130F', drop: '#B93C14' }, LETTER = { pickup: 'A', drop: 'B' };
+function pinIcon(which, animate) {
+  return L.divIcon({ className: '', html: '<div class="pinwrap' + (animate ? ' drop' : '') + '" style="--c:' + COLORS[which] + '"><div class="pin" style="background:' + COLORS[which] + '"><span>' + LETTER[which] + '</span></div></div>', iconSize: [30, 30], iconAnchor: [15, 30] });
 }
 function initMap() {
   if (map) return;
   map = L.map('map', { zoomControl: true, attributionControl: true, maxBounds: [[-2.4, 29.6], [-1.5, 30.6]] }).setView(CONFIG.CENTER, 13);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
-  map.on('click', function (e) { setPoint(cur(), e.latlng.lat, e.latlng.lng, null); });
+  map.on('click', function (e) { setPoint(S.active, e.latlng.lat, e.latlng.lng, null); });
 }
-function cur() { return S.step === 'drop' ? 'drop' : 'pickup'; }
-function drawMarkers() {
-  [['pickup', 'A', '#16130F'], ['drop', 'B', '#B93C14']].forEach(function (d) {
-    var p = S[d[0]], key = d[0] === 'pickup' ? 'mA' : 'mB', m = key === 'mA' ? mA : mB;
-    var show = p && (d[0] === 'pickup' || S.step === 'drop');
-    if (!show) { if (m) { map.removeLayer(m); } if (key === 'mA') mA = null; else mB = null; return; }
-    if (!m) {
-      m = L.marker([p.lat, p.lng], { icon: pinIcon(d[1], d[2]), draggable: true });
-      m.on('dragend', function (ev) { var ll = ev.target.getLatLng(); setPoint(d[0], ll.lat, ll.lng, null); });
-      m.addTo(map);
-      if (key === 'mA') mA = m; else mB = m;
-    } else m.setLatLng([p.lat, p.lng]);
-    if (m.dragging) { if (d[0] === cur()) m.dragging.enable(); else m.dragging.disable(); }
-    m.setOpacity(d[0] === cur() ? 1 : 0.55);
-  });
+function placeMarker(which, isNew) {
+  var p = S[which], m = markers[which];
+  if (!p) { if (m) { map.removeLayer(m); markers[which] = null; } return; }
+  if (!m || isNew) {
+    if (m) map.removeLayer(m);
+    m = L.marker([p.lat, p.lng], { icon: pinIcon(which, true), draggable: true, keyboard: false });
+    m.on('dragend', function (ev) { var ll = ev.target.getLatLng(); S.active = which; setPoint(which, ll.lat, ll.lng, null, true); });
+    m.addTo(map); markers[which] = m;
+  } else m.setLatLng([p.lat, p.lng]);
 }
-function setPoint(which, lat, lng, name, silentFly) {
-  var prevNote = S[which] ? S[which].note : '';
-  S[which] = { lat: +lat.toFixed(6), lng: +lng.toFixed(6), name: name || 'Pinned location', note: prevNote, plus: shortPlus(lat, lng) };
-  S.quoteKey = '';
-  drawMarkers();
-  if (!silentFly) {
-    if (which === 'drop' && S.pickup) map.fitBounds([[S.pickup.lat, S.pickup.lng], [lat, lng]], { padding: [40, 40], maxZoom: 16 });
-    else map.setView([lat, lng], Math.max(map.getZoom(), 16));
+function drawRoute(coords) {
+  if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+  if (!S.pickup || !S.drop) return;
+  var pts = coords && coords.length ? coords.map(function (c) { return [c[1], c[0]]; }) : [[S.pickup.lat, S.pickup.lng], [S.drop.lat, S.drop.lng]];
+  routeLine = L.polyline(pts, { color: '#16130F', weight: 4, opacity: .85, className: 'mm-route', interactive: false }).addTo(map);
+  // pathLength=1 makes the "draw itself" animation independent of zoom; once drawn it becomes a plain line.
+  var el = routeLine.getElement && routeLine.getElement();
+  if (el) {
+    el.setAttribute('pathLength', '1');
+    var done = function () { el.classList.add('drawn'); };
+    el.addEventListener('animationend', done, { once: true });
+    setTimeout(done, 1400);
   }
-  renderPicked();
-  $('locErr').textContent = '';
-  if (!name) reverse(which, lat, lng);
 }
-function renderPicked() {
-  var p = S[cur()];
-  $('picked').hidden = !p;
-  if (!p) return;
-  $('pickedBadge').textContent = cur() === 'drop' ? 'B' : 'A';
-  $('pickedBadge').style.background = cur() === 'drop' ? '#B93C14' : '#16130F';
-  $('pickedName').textContent = p.name;
-  $('pickedSub').textContent = p.plus + ' Kigali';
-  $('landmark').value = p.note || '';
+function fitBoth() {
+  if (S.pickup && S.drop) map.fitBounds([[S.pickup.lat, S.pickup.lng], [S.drop.lat, S.drop.lng]], { padding: [36, 36], maxZoom: 16 });
+}
+function setPoint(which, lat, lng, name, fromDrag) {
+  var had = S[which], prevNote = had ? had.note : '';
+  S[which] = { lat: +lat.toFixed(6), lng: +lng.toFixed(6), name: name || 'Pinned location', note: prevNote, plus: shortPlus(lat, lng) };
+  placeMarker(which, !had);
+  var other = which === 'pickup' ? 'drop' : 'pickup';
+  if (which === 'pickup') toast(S.drop ? 'Pickup updated' : 'Pickup set · now where is it going?');
+  else toast(!S.pickup ? 'Drop-off set · now set the pickup' : S.size ? 'Drop-off set · getting price' : 'Drop-off set · now pick a size');
+  if (!S[other]) S.active = other;            // move straight on to the empty point
+  if (!fromDrag) { if (S.pickup && S.drop) fitBoth(); else map.setView([lat, lng], Math.max(map.getZoom(), 15)); }
+  $('locErr').textContent = ''; $('results').innerHTML = ''; $('searchInput').value = '';
+  if (!name) reverse(which, lat, lng);
+  renderRoute(true);
+  requestQuote();
 }
 function reverse(which, lat, lng) {
   fetch('https://photon.komoot.io/reverse?lat=' + lat + '&lon=' + lng + '&limit=1')
@@ -409,9 +570,61 @@ function reverse(which, lat, lng) {
       var f = j.features && j.features[0]; if (!f || !S[which] || S[which].lat !== +lat.toFixed(6)) return;
       var pr = f.properties || {};
       var label = pr.name || [pr.street, pr.district || pr.locality].filter(Boolean).join(', ') || pr.district || pr.city;
-      if (label) { S[which].name = label; if (which === cur()) renderPicked(); }
+      if (label) { S[which].name = label; renderRoute(false); }
     }).catch(function () {});
 }
+function renderRoute(ringActive) {
+  ['pickup', 'drop'].forEach(function (w) {
+    var L1 = w === 'pickup' ? 'A' : 'B', p = S[w];
+    $('name' + L1).hidden = !p; $('ph' + L1).hidden = !!p;
+    if (p) $('name' + L1).textContent = p.name;
+    var ok = $('ok' + L1); if (!!p !== !ok.hidden) { ok.hidden = !p; ok.innerHTML = p ? CHECK : ''; }
+    var f = $('field' + L1), on = S.active === w;
+    if (on && (ringActive || !f.classList.contains('on'))) { f.classList.remove('on'); void f.offsetWidth; }
+    f.classList.toggle('on', on);
+  });
+  $('conn').classList.toggle('on', !!S.pickup);
+  var letter = S.active === 'pickup' ? 'A' : 'B';
+  $('mapTag').textContent = 'TAP TO PLACE ' + letter;
+  $('searchInput').placeholder = S.active === 'pickup' ? 'Search pickup: place or landmark' : 'Search drop-off: place or landmark';
+  var cur = S[S.active];
+  $('landmarkBox').hidden = !cur;
+  $('landmarkLbl').textContent = 'Landmark at ' + letter + ' (optional)';
+  if (cur && document.activeElement !== $('landmark')) $('landmark').value = cur.note || '';
+  Object.keys(markers).forEach(function (w) { if (markers[w]) { markers[w].setOpacity(S.active === w || !S[S.active] ? 1 : 0.6); if (markers[w].dragging) markers[w].dragging.enable(); } });
+  document.querySelectorAll('[data-size]').forEach(function (b) { b.classList.toggle('on', b.dataset.size === S.size); });
+  $('largeNote').hidden = S.size !== 'Large';
+  renderBar(); renderProgress();
+}
+function enterRoute() {
+  initMap();
+  $('pasteBox').hidden = true; $('gpsNote').hidden = true;
+  if (!S.pickup) S.active = 'pickup'; else if (!S.drop) S.active = 'drop';
+  setTimeout(function () {
+    map.invalidateSize();
+    if (S.pickup && S.drop) fitBoth();
+    else if (S[S.active]) map.setView([S[S.active].lat, S[S.active].lng], 16);
+    else if (S.pickup) map.setView([S.pickup.lat, S.pickup.lng], 14);
+    else map.setView(CONFIG.CENTER, 13);
+    if (S.pickup && S.drop) drawRoute(S.routeGeo);
+  }, 30);
+  renderRoute(true);
+}
+document.querySelectorAll('.field').forEach(function (f) {
+  f.addEventListener('click', function () {
+    S.active = f.dataset.pt; $('results').innerHTML = ''; $('searchInput').value = '';
+    var p = S[S.active]; if (p && map) map.setView([p.lat, p.lng], Math.max(map.getZoom(), 15));
+    renderRoute(true);
+  });
+});
+$('landmark').addEventListener('input', function () { if (S[S.active]) S[S.active].note = this.value; });
+document.querySelectorAll('[data-size]').forEach(function (b) {
+  b.addEventListener('click', function () {
+    var had = S.size; S.size = b.dataset.size; $('sizeErr').textContent = '';
+    renderRoute(false);
+    if (S.size !== 'Large' && !had && priceReady()) toast('Price ready · ' + fmt(S.quote.fee) + ' RWF');
+  });
+});
 
 /* ---------- search (Photon / OpenStreetMap) ---------- */
 var searchTimer;
@@ -436,7 +649,7 @@ function search(q) {
       var detail = [pr.street && pr.name ? pr.street : '', pr.district || pr.locality, pr.city].filter(Boolean).join(', ');
       var li = document.createElement('li'), btn = document.createElement('button'), b1 = document.createElement('b'), s1 = document.createElement('small');
       b1.textContent = title; s1.textContent = detail; btn.appendChild(b1); btn.appendChild(s1);
-      btn.addEventListener('click', function () { ul.innerHTML = ''; $('searchInput').value = ''; $('searchInput').blur(); setPoint(cur(), c[1], c[0], title); });
+      btn.addEventListener('click', function () { $('searchInput').blur(); setPoint(S.active, c[1], c[0], title); });
       li.appendChild(btn); ul.appendChild(li);
     });
   }).catch(function () { $('results').innerHTML = '<li class="empty">Search is unavailable right now. Tap the map instead.</li>'; });
@@ -446,16 +659,17 @@ function search(q) {
 $('gpsBtn').addEventListener('click', function () {
   if (!navigator.geolocation) { $('locErr').textContent = 'Your browser can’t share location. Search or tap the map instead.'; return; }
   $('gpsLabel').textContent = 'Locating…';
+  var which = S.active;
   navigator.geolocation.getCurrentPosition(function (pos) {
-    $('gpsLabel').textContent = 'My location';
+    $('gpsLabel').textContent = 'Use my location';
     var acc = Math.round(pos.coords.accuracy);
-    setPoint(cur(), pos.coords.latitude, pos.coords.longitude, 'Your current location');
-    reverse(cur(), pos.coords.latitude, pos.coords.longitude);
-    map.setView([pos.coords.latitude, pos.coords.longitude], 17);
+    S.active = which;
+    setPoint(which, pos.coords.latitude, pos.coords.longitude, null);
+    if (!S.pickup || !S.drop) map.setView([pos.coords.latitude, pos.coords.longitude], 17);
     $('gpsNote').hidden = acc <= 60;
     $('gpsNote').textContent = 'Accurate to about ' + acc + ' m. Drag the pin if it’s not quite right.';
   }, function (err) {
-    $('gpsLabel').textContent = 'My location';
+    $('gpsLabel').textContent = 'Use my location';
     $('locErr').textContent = err.code === 1
       ? 'Location is blocked. Allow it for this site in your browser settings, or search / tap the map instead.'
       : 'We couldn’t get your location. Try again outside, or search / tap the map.';
@@ -463,7 +677,7 @@ $('gpsBtn').addEventListener('click', function () {
 });
 
 /* ---------- paste link / plus code ---------- */
-$('pasteBtn').addEventListener('click', function () { $('pasteBox').hidden = !$('pasteBox').hidden; if (!$('pasteBox').hidden) $('pasteInput').focus(); });
+$('pasteBtn').addEventListener('click', function () { $('pasteBox').hidden = !$('pasteBox').hidden; $('pasteErr').textContent = ''; if (!$('pasteBox').hidden) $('pasteInput').focus(); });
 $('pasteUse').addEventListener('click', usePaste);
 function parseCoords(s) {
   try { s = decodeURIComponent(s); } catch (e) {}
@@ -481,7 +695,7 @@ function usePaste() {
   if (/^https?:\/\//i.test(v) || /goo\.gl|maps\.app/i.test(v)) {
     var url = /^https?:/i.test(v) ? v : 'https://' + v;
     $('pasteUse').textContent = 'Reading link…';
-    fetch(CONFIG.SCRIPT_URL + '?action=resolve&url=' + encodeURIComponent(url)).then(function (r) { return r.json(); }).then(function (j) {
+    getJson(CONFIG.SCRIPT_URL + '?action=resolve&url=' + encodeURIComponent(url), 10000, 2).then(function (j) {
       $('pasteUse').textContent = 'Use this location';
       if (j.ok) applyPasted({ lat: j.lat, lng: j.lng }); else $('pasteErr').textContent = 'We couldn’t find a location in that link. Try searching or tapping the map.';
     }).catch(function () { $('pasteUse').textContent = 'Use this location'; $('pasteErr').textContent = 'Couldn’t read that link right now.'; });
@@ -489,92 +703,194 @@ function usePaste() {
   }
   $('pasteErr').textContent = 'That doesn’t look like a Maps link or plus code.';
 }
-function applyPasted(ll) { $('pasteBox').hidden = true; $('pasteInput').value = ''; setPoint(cur(), ll.lat, ll.lng, null); }
-
-$('landmark').addEventListener('input', function () { if (S[cur()]) S[cur()].note = this.value; });
-
-/* ---------- enter handlers ---------- */
-var enter = {
-  pickup: function () { locScreen(); },
-  drop: function () { locScreen(); },
-  size: function () { markOpts('[data-size]', 'size', S.size); $('largeNote').hidden = S.size !== 'Large'; },
-  price: function () { renderWhen(); getQuote(); },
-  handover: function () { markOpts('[data-handover]', 'handover', S.handover); showHandFields(); },
-  receiver: function () {
-    $('rName').value = S.receiver.name; $('rPhone').value = S.receiver.phone;
-    $('contactBtn').hidden = !('contacts' in navigator && 'select' in navigator.contacts);
-  },
-  you: function () { $('yName').value = S.customer.name; $('yPhone').value = S.customer.phone; },
-  details: function () { renderDetails(); },
-  review: function () { renderReview(); }
-};
-function locScreen() {
-  var drop = S.step === 'drop';
-  $('locTitle').textContent = drop ? 'Where is it going?' : 'Where are we picking up?';
-  $('locSub').textContent = drop ? 'Search, paste a link, or drop a pin where the receiver is.' : 'Use your location, search, paste a link from WhatsApp or Google Maps, or drop a pin.';
-  $('gpsNote').hidden = true; $('dropTip').hidden = !drop; $('pasteBox').hidden = true; $('results').innerHTML = ''; $('searchInput').value = '';
-  initMap();
-  setTimeout(function () {
-    map.invalidateSize();
-    drawMarkers();
-    if (drop && S.pickup && S.drop) map.fitBounds([[S.pickup.lat, S.pickup.lng], [S.drop.lat, S.drop.lng]], { padding: [40, 40] });
-    else if (S[cur()]) map.setView([S[cur()].lat, S[cur()].lng], 16);
-    else if (drop && S.pickup) map.setView([S.pickup.lat, S.pickup.lng], 13);
-    else map.setView(CONFIG.CENTER, 13);
-  }, 30);
-  renderPicked();
-}
-function markOpts(sel, attr, val) { document.querySelectorAll(sel).forEach(function (b) { b.classList.toggle('on', b.dataset[attr] === val); }); }
-
-/* ---------- size ---------- */
-document.querySelectorAll('[data-size]').forEach(function (b) {
-  b.addEventListener('click', function () { S.size = b.dataset.size; markOpts('[data-size]', 'size', S.size); $('largeNote').hidden = S.size !== 'Large'; $('sizeErr').textContent = ''; });
-});
+function applyPasted(ll) { $('pasteBox').hidden = true; $('pasteInput').value = ''; setPoint(S.active, ll.lat, ll.lng, null); }
 
 /* ---------- price ---------- */
-function fmt(n) { return Number(n).toLocaleString('en-US'); }
-function getQuote() {
-  var key = [S.pickup.lat, S.pickup.lng, S.drop.lat, S.drop.lng].join(',');
-  if (S.quote && S.quoteKey === key) return renderPrice();
-  S.quoting = true; S.quote = null; $('nextBtn').disabled = true;
-  $('priceBox').innerHTML = '<div class="skeleton" aria-label="Calculating your price"></div>';
-  var url = CONFIG.SCRIPT_URL + '?action=quote&pLat=' + S.pickup.lat + '&pLng=' + S.pickup.lng + '&dLat=' + S.drop.lat + '&dLng=' + S.drop.lng;
-  fetch(url).then(function (r) { return r.json(); }).then(function (j) {
-    S.quoting = false;
-    if (!j.ok) throw new Error(j.error || 'quote failed');
-    S.quote = j; S.quoteKey = key; renderPrice();
-  }).catch(function () {
-    S.quoting = false; $('nextBtn').disabled = false; $('nextBtn').textContent = 'Try again';
-    $('priceBox').innerHTML = '<h1>We couldn’t get a price</h1><p class="sub">Check your connection and try again, or send both pins on WhatsApp.</p>';
+/* Road distance from the same OSRM server the Pricing Lab uses, fetched by the phone
+   (fast) rather than by Apps Script (slow from Google's servers). The script checks it
+   is plausible before pricing with it. Resolves null if it fails or takes over 8 s.
+   The simplified road shape is only used to draw the route on the map. */
+function roadRoute(a, b) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
+  var url = 'https://routing.openstreetmap.de/routed-car/route/v1/driving/' + a.lng + ',' + a.lat + ';' + b.lng + ',' + b.lat + '?overview=simplified&geometries=geojson&steps=false';
+  return fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) { return r.json(); }).then(function (j) {
+    clearTimeout(timer);
+    if (j.code !== 'Ok' || !j.routes || !j.routes[0]) return null;
+    var r0 = j.routes[0];
+    return { km: r0.distance / 1000, mins: Math.ceil(r0.duration / 60), geo: r0.geometry && r0.geometry.coordinates };
+  }).catch(function () { clearTimeout(timer); return null; });
+}
+/* GET JSON with a time limit. Apps Script occasionally stalls a request that a
+   retry answers in seconds, so try again after `ms` before giving up. */
+function getJson(url, ms, tries) {
+  var ctl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctl) ctl.abort(); }, ms);
+  return fetch(url + (url.indexOf('?') < 0 ? '?' : '&') + 't=' + Date.now(), ctl ? { signal: ctl.signal } : {})
+    .then(function (r) { clearTimeout(timer); return r.json(); })
+    .catch(function (err) {
+      clearTimeout(timer);
+      if (tries > 1) return getJson(url, ms, tries - 1);
+      throw err;
+    });
+}
+function quoteKey() { return S.pickup && S.drop ? [S.pickup.lat, S.pickup.lng, S.drop.lat, S.drop.lng].join(',') : ''; }
+var quoteTimer;
+function requestQuote() {
+  clearTimeout(quoteTimer);
+  var key = quoteKey();
+  if (!key) { renderBar(); return; }
+  if (S.quote && S.quoteKey === key) { renderBar(); return; }
+  S.quoting = true; S.quoteErr = false; renderBar();
+  quoteTimer = setTimeout(function () {
+    var url = CONFIG.SCRIPT_URL + '?action=quote&pLat=' + S.pickup.lat + '&pLng=' + S.pickup.lng + '&dLat=' + S.drop.lat + '&dLng=' + S.drop.lng;
+    roadRoute(S.pickup, S.drop).then(function (rt) {
+      if (quoteKey() !== key) throw 'stale';
+      S.route = rt ? { km: rt.km, mins: rt.mins } : null;
+      S.routeGeo = rt && rt.geo; drawRoute(S.routeGeo);
+      return getJson(url + (rt ? '&rk=' + rt.km + '&rm=' + rt.mins : ''), 10000, 3);
+    }).then(function (j) {
+      if (quoteKey() !== key) return;
+      S.quoting = false;
+      if (!j.ok) throw new Error(j.error || 'quote failed');
+      var hadPrice = priceReady();
+      S.quote = j; S.quoteKey = key;
+      renderBar(); renderProgress();
+      if (!hadPrice && priceReady() && S.step === 'route') toast('Price ready · ' + fmt(j.fee) + ' RWF');
+    }).catch(function (e) {
+      if (e === 'stale' || quoteKey() !== key) return;
+      S.quoting = false; S.quoteErr = true; renderBar();
+    });
+  }, 250);
+}
+
+/* ---------- STEP 2: who ---------- */
+function enterWho() {
+  $('whoA').textContent = S.pickup.name; $('whoB').textContent = S.drop.name;
+  $('meName').value = S.customer.name; $('mePhone').value = S.customer.phone;
+  $('yName').value = S.customer.name; $('yPhone').value = S.customer.phone;
+  $('sName').value = S.sender.name; $('sPhone').value = S.sender.phone;
+  $('rName').value = S.receiver.name; $('rPhone').value = S.receiver.phone;
+  $('contactBtn').hidden = !('contacts' in navigator && 'select' in navigator.contacts);
+  renderWho(null);
+}
+function renderWho(before) {
+  document.querySelectorAll('[data-handover]').forEach(function (b) { b.classList.toggle('on', b.dataset.handover === S.handover); });
+  $('meFields').hidden = S.handover !== 'me'; $('otherFields').hidden = S.handover !== 'other';
+  $('otherFields').style.display = S.handover === 'other' ? 'flex' : '';
+  var w = whoStatus();
+  $('recvCard').hidden = !(w.p || S.tried || nameOk($('rName').value) || $('rPhone').value.trim());
+  $('youCard').hidden = !(S.handover === 'other' && (w.r || S.tried));
+  setBadge('badgeP', w.p); setBadge('badgeR', w.r);
+  $('contactBtn').style.display = w.r ? 'none' : '';
+  [['meName', 'n'], ['mePhone', 'p'], ['sName', 'n'], ['sPhone', 'p'], ['rName', 'n'], ['rPhone', 'p'], ['yName', 'n'], ['yPhone', 'p']].forEach(function (f) {
+    var v = $(f[0]).value, ok = f[1] === 'n' ? nameOk(v) : phone(v).ok, el = document.querySelector('[data-ok="' + f[0] + '"]');
+    if (ok !== !el.hidden) { el.hidden = !ok; el.innerHTML = ok ? CHECK : ''; }
+    if (ok) { $(f[0]).classList.remove('bad'); var e = document.querySelector('[data-err="' + f[0] + '"]'); if (e) e.textContent = ''; }
   });
-}
-function renderPrice() {
-  var q = S.quote, box = $('priceBox');
-  $('nextBtn').disabled = false;
-  if (!q.inArea) {
-    $('whenBox').hidden = true; $('nextBtn').textContent = 'Change locations'; $('barNote').hidden = true;
-    box.innerHTML = '<h1>We’ll quote this one personally</h1><p class="sub">One of the pins is outside Kigali, where we don’t run yet. Change a location, or send both pins on WhatsApp.</p>';
-    return;
+  if (before) {
+    if (w.all && !before.all) toast('All set · tap Continue');
+    else if (w.p && !before.p && !w.r) toast('Pickup done · now the receiver');
+    else if (w.r && !before.r && !w.y) toast('Receiver done · last, your details');
   }
-  $('whenBox').hidden = false; $('nextBtn').textContent = LABELS.price;
-  box.innerHTML = '';
-  var card = document.createElement('div'); card.className = 'price';
-  card.innerHTML = '<div class="k mono">YOUR DELIVERY FEE</div><div class="v"></div><div class="m"></div>' +
-    '<div class="route"><div><span class="dot" style="background:#F5F1EA;color:#16130F">A</span><span class="a"></span></div><div><span class="dot" style="background:#B93C14;color:#fff">B</span><span class="b"></span></div></div>';
-  card.querySelector('.v').textContent = fmt(q.fee) + ' RWF';
-  card.querySelector('.m').textContent = q.km.toFixed(2) + ' km by road · about ' + q.mins + ' min' + (q.source === 'estimate' ? ' · estimated' : '');
-  card.querySelector('.a').textContent = S.pickup.name; card.querySelector('.b').textContent = S.drop.name;
-  box.appendChild(card);
-  var t = document.createElement('div'); t.className = 'table'; t.style.marginTop = '16px';
-  var rows = [['Base fare', q.base]].concat(q.lines.map(function (l) { return [l.label, l.amount]; }));
-  rows.forEach(function (r) { var d = document.createElement('div'); d.className = 'row'; var a = document.createElement('span'), b = document.createElement('span'); a.textContent = r[0]; b.textContent = fmt(r[1]) + ' RWF'; d.appendChild(a); d.appendChild(b); t.appendChild(d); });
-  var tot = document.createElement('div'); tot.className = 'row total'; tot.innerHTML = '<span>Total</span><span></span>'; tot.lastChild.textContent = fmt(q.fee) + ' RWF'; t.appendChild(tot);
-  box.appendChild(t);
+  renderProgress();
 }
-document.querySelectorAll('[data-when]').forEach(function (b) {
-  b.addEventListener('click', function () { S.when = b.dataset.when; renderWhen(); });
+function setBadge(id, on) { var el = $(id); if (on !== !el.hidden) { el.hidden = !on; el.innerHTML = on ? BADGE : ''; } }
+['meName', 'mePhone', 'sName', 'sPhone', 'rName', 'rPhone', 'yName', 'yPhone'].forEach(function (id) {
+  var last = null;
+  $(id).addEventListener('focus', function () { last = whoStatus(); });
+  $(id).addEventListener('input', function () {
+    var before = last || whoStatus();
+    if (id === 'meName' || id === 'yName') { $('meName').value = $('yName').value = this.value; }
+    if (id === 'mePhone' || id === 'yPhone') { $('mePhone').value = $('yPhone').value = this.value; }
+    renderWho(before); last = whoStatus();
+  });
 });
-$('whenAt').addEventListener('change', function () { S.whenAt = this.value; });
+document.querySelectorAll('[data-handover]').forEach(function (b) {
+  b.addEventListener('click', function () { S.handover = b.dataset.handover; renderWho(null); });
+});
+$('contactBtn').addEventListener('click', function () {
+  navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (list) {
+    var c = list && list[0]; if (!c) return;
+    var before = whoStatus();
+    if (c.name && c.name[0]) $('rName').value = c.name[0];
+    if (c.tel && c.tel[0]) $('rPhone').value = c.tel[0];
+    renderWho(before);
+  }).catch(function () {});
+});
+function saveWho() {
+  S.customer = { name: $('meName').value.trim(), phone: $('mePhone').value.trim() };
+  S.sender = { name: $('sName').value.trim(), phone: $('sPhone').value.trim() };
+  S.receiver = { name: $('rName').value.trim(), phone: $('rPhone').value.trim() };
+}
+
+/* ---------- validation ---------- */
+function validRoute() {
+  if (!S.pickup) { $('locErr').textContent = 'Set the pickup point (A).'; S.active = 'pickup'; renderRoute(true); return false; }
+  if (!S.drop) { $('locErr').textContent = 'Set the drop-off point (B).'; S.active = 'drop'; renderRoute(true); return false; }
+  if (!S.size) { $('sizeErr').textContent = 'Choose a size to see your price.'; return false; }
+  return priceReady();
+}
+function validWho() {
+  saveWho(); S.tried = true;
+  var ok = true;
+  if (S.handover === 'me') {
+    if (!nameOk(S.customer.name)) { fieldErr('meName', 'Add your name.'); ok = false; }
+    if (!phone(S.customer.phone).ok) { fieldErr('mePhone', PHONE_ERR); ok = false; }
+  } else {
+    if (!nameOk(S.sender.name)) { fieldErr('sName', 'Add their name.'); ok = false; }
+    if (!phone(S.sender.phone).ok) { fieldErr('sPhone', PHONE_ERR); ok = false; }
+  }
+  if (!nameOk(S.receiver.name)) { fieldErr('rName', 'Add the receiver’s name.'); ok = false; }
+  if (!phone(S.receiver.phone).ok) { fieldErr('rPhone', PHONE_ERR); ok = false; }
+  if (S.handover === 'other') {
+    if (!nameOk(S.customer.name)) { fieldErr('yName', 'Add your name.'); ok = false; }
+    if (!phone(S.customer.phone).ok) { fieldErr('yPhone', PHONE_ERR); ok = false; }
+  }
+  renderWho(null);
+  if (!ok) { var bad = document.querySelector('.inp.bad'); if (bad) bad.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+  return ok;
+}
+
+/* ---------- bottom bar actions ---------- */
+$('nextBtn').addEventListener('click', function () {
+  var act = this.dataset.act;
+  if (act === 'chat') {
+    var pins = S.pickup && S.drop ? 'Pickup: https://maps.google.com/?q=' + S.pickup.lat + ',' + S.pickup.lng + '\nDrop-off: https://maps.google.com/?q=' + S.drop.lat + ',' + S.drop.lng : '';
+    window.location.href = chatUrl(pins); return;
+  }
+  if (act === 'retry') { S.quoteKey = ''; S.quote = null; requestQuote(); return; }
+  if (S.step === 'route') { if (validRoute()) go('who'); return; }
+  if (S.step === 'who') { if (validWho()) go('confirm'); }
+});
+
+/* ---------- STEP 3: confirm ---------- */
+function whenText() { return S.when === 'later' && S.whenAt ? new Date(S.whenAt).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'As soon as possible'; }
+function handText() { return S.handover === 'other' ? S.sender.name + ' · ' + phone(S.sender.phone).pretty : 'You · ' + phone(S.customer.phone).pretty; }
+function parcelText() { var d = S.details; return [S.size, d.item, d.weight, d.fragile ? 'Fragile' : ''].filter(Boolean).join(' · '); }
+function enterConfirm() {
+  S.sendFailed = false;
+  var p = S.pickup, d = S.drop, q = S.quote;
+  $('sumA').textContent = p.name + (p.note ? ' — ' + p.note : '');
+  $('sumHand').textContent = 'Hand over: ' + handText();
+  $('sumB').textContent = d.name + (d.note ? ' — ' + d.note : '');
+  $('sumRecv').textContent = 'Receiver: ' + S.receiver.name + ' · ' + phone(S.receiver.phone).pretty;
+  $('sumYou').textContent = 'Your WhatsApp: ' + phone(S.customer.phone).pretty;
+  $('feeBig').textContent = fmt(q.fee) + ' RWF';
+  $('feeSub').textContent = q.km.toFixed(2) + ' km by road · about ' + q.mins + ' min';
+  var box = $('breakBox'); box.innerHTML = '';
+  [['Base fare', q.base]].concat((q.lines || []).map(function (l) { return [l.label, l.amount]; })).forEach(function (r) {
+    var row = document.createElement('div'); row.className = 'row';
+    var a = document.createElement('span'), b = document.createElement('span'); a.textContent = r[0]; b.textContent = fmt(r[1]) + ' RWF';
+    row.appendChild(a); row.appendChild(b); box.appendChild(row);
+  });
+  renderWhen(); renderDetails();
+}
+document.querySelectorAll('[data-edit]').forEach(function (b) { b.addEventListener('click', function () { go(b.dataset.edit); }); });
+document.querySelectorAll('[data-when]').forEach(function (b) {
+  b.addEventListener('click', function () { S.when = b.dataset.when; $('whenErr').textContent = ''; renderWhen(); });
+});
+$('whenAt').addEventListener('change', function () { S.whenAt = this.value; $('whenErr').textContent = ''; });
 function renderWhen() {
   document.querySelectorAll('[data-when]').forEach(function (b) { b.classList.toggle('on', b.dataset.when === S.when); });
   $('laterBox').hidden = S.when !== 'later';
@@ -582,110 +898,32 @@ function renderWhen() {
   $('whenAt').min = now.toISOString().slice(0, 16);
   $('whenAt').value = S.whenAt;
 }
-
-/* ---------- handover ---------- */
-document.querySelectorAll('[data-handover]').forEach(function (b) {
-  b.addEventListener('click', function () { S.handover = b.dataset.handover; markOpts('[data-handover]', 'handover', S.handover); showHandFields(); $('handErr').textContent = ''; });
+$('breakBtn').addEventListener('click', function () {
+  var open = $('breakBox').hidden; $('breakBox').hidden = !open;
+  this.textContent = open ? 'Hide breakdown' : 'How it’s calculated';
 });
-function showHandFields() {
-  $('meFields').hidden = S.handover !== 'me'; $('otherFields').hidden = S.handover !== 'other';
-  $('meName').value = S.customer.name; $('mePhone').value = S.customer.phone;
-  $('sName').value = S.sender.name; $('sPhone').value = S.sender.phone;
-}
-
-/* ---------- contacts (Android Chrome only) ---------- */
-$('contactBtn').addEventListener('click', function () {
-  navigator.contacts.select(['name', 'tel'], { multiple: false }).then(function (list) {
-    var c = list && list[0]; if (!c) return;
-    if (c.name && c.name[0]) $('rName').value = c.name[0];
-    if (c.tel && c.tel[0]) $('rPhone').value = c.tel[0];
-  }).catch(function () {});
+$('detailsBtn').addEventListener('click', function () {
+  var open = $('detailsBody').hidden; $('detailsBody').hidden = !open; $('detailsBody').style.display = open ? 'flex' : '';
+  this.setAttribute('aria-expanded', String(open)); renderDetails();
 });
-
-/* ---------- details ---------- */
 document.querySelectorAll('[data-group]').forEach(function (g) {
   g.querySelectorAll('.chip').forEach(function (c) {
     c.addEventListener('click', function () { var k = g.dataset.group; S.details[k] = S.details[k] === c.textContent ? '' : c.textContent; renderDetails(); });
   });
 });
 $('fragileBtn').addEventListener('click', function () { S.details.fragile = !S.details.fragile; renderDetails(); });
-$('notes').addEventListener('input', function () { S.details.notes = this.value; });
+$('notes').addEventListener('input', function () { S.details.notes = this.value; renderDetailsHint(); });
 function renderDetails() {
   document.querySelectorAll('[data-group]').forEach(function (g) { g.querySelectorAll('.chip').forEach(function (c) { c.classList.toggle('on', S.details[g.dataset.group] === c.textContent); }); });
   $('fragileBtn').classList.toggle('on', S.details.fragile); $('fragileBtn').setAttribute('aria-pressed', String(S.details.fragile));
-  $('notes').value = S.details.notes;
+  if (document.activeElement !== $('notes')) $('notes').value = S.details.notes;
+  $('sumParcel').textContent = parcelText() || '—';
+  renderDetailsHint();
 }
-
-/* ---------- validation ---------- */
-function nameOk(v) { return String(v || '').trim().length > 1; }
-var validate = {
-  pickup: function () { if (!S.pickup) { $('locErr').textContent = 'Set a pickup point to continue.'; return false; } return true; },
-  drop: function () { if (!S.drop) { $('locErr').textContent = 'Set a drop-off point to continue.'; return false; } return true; },
-  size: function () {
-    if (!S.size) { $('sizeErr').textContent = 'Choose a size to see your price.'; return false; }
-    if (S.size === 'Large') { $('sizeErr').textContent = 'This one needs a chat. Message us on WhatsApp.'; return false; }
-    return true;
-  },
-  price: function () {
-    if (S.quoting) return false;
-    if (!S.quote) { getQuote(); return false; }
-    if (!S.quote.inArea) { go('pickup'); return false; }
-    if (S.when === 'later' && !S.whenAt) { $('whenErr').textContent = 'Choose a pickup date and time.'; return false; }
-    return true;
-  },
-  handover: function () {
-    if (!S.handover) { $('handErr').textContent = 'Choose who hands it over.'; return false; }
-    var ok = true;
-    if (S.handover === 'me') {
-      S.customer = { name: $('meName').value.trim(), phone: $('mePhone').value.trim() };
-      if (!nameOk(S.customer.name)) { fieldErr('meName', 'Add your name.'); ok = false; }
-      if (!phone(S.customer.phone).ok) { fieldErr('mePhone', PHONE_ERR); ok = false; }
-    } else {
-      S.sender = { name: $('sName').value.trim(), phone: $('sPhone').value.trim() };
-      if (!nameOk(S.sender.name)) { fieldErr('sName', 'Add their name.'); ok = false; }
-      if (!phone(S.sender.phone).ok) { fieldErr('sPhone', PHONE_ERR); ok = false; }
-    }
-    return ok;
-  },
-  receiver: function () {
-    S.receiver = { name: $('rName').value.trim(), phone: $('rPhone').value.trim() };
-    var ok = true;
-    if (!nameOk(S.receiver.name)) { fieldErr('rName', 'Add the receiver’s name.'); ok = false; }
-    if (!phone(S.receiver.phone).ok) { fieldErr('rPhone', PHONE_ERR); ok = false; }
-    return ok;
-  },
-  you: function () {
-    S.customer = { name: $('yName').value.trim(), phone: $('yPhone').value.trim() };
-    var ok = true;
-    if (!nameOk(S.customer.name)) { fieldErr('yName', 'Add your name.'); ok = false; }
-    if (!phone(S.customer.phone).ok) { fieldErr('yPhone', PHONE_ERR); ok = false; }
-    return ok;
-  }
-};
-
-/* ---------- review ---------- */
-function whenText() { return S.when === 'later' && S.whenAt ? new Date(S.whenAt).toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'As soon as possible'; }
-function handText() { return S.handover === 'other' ? S.sender.name + ' · ' + phone(S.sender.phone).pretty : 'You · ' + phone(S.customer.phone).pretty; }
-function parcelText() { var d = S.details; return [S.size, d.item, d.weight, d.fragile ? 'Fragile' : ''].filter(Boolean).join(' · '); }
-function renderReview() {
-  var list = $('reviewList'); list.innerHTML = '';
-  var rows = [
-    ['PICKUP · A', S.pickup.name + (S.pickup.note ? ' — ' + S.pickup.note : ''), 'Hand over: ' + handText(), 'pickup'],
-    ['DROP-OFF · B', S.drop.name + (S.drop.note ? ' — ' + S.drop.note : ''), 'Receiver: ' + S.receiver.name + ' · ' + phone(S.receiver.phone).pretty, 'drop'],
-    ['PARCEL', parcelText() || '—', [S.details.payer ? S.details.payer + ' pays' : '', S.details.payMethod, S.details.notes ? 'Note: ' + S.details.notes : ''].filter(Boolean).join(' · ') || 'No notes', 'details'],
-    ['WHEN', whenText(), S.quote.km.toFixed(2) + ' km · about ' + S.quote.mins + ' min', 'price'],
-    ['YOUR CONTACT', S.customer.name, phone(S.customer.phone).pretty, S.handover === 'other' ? 'you' : 'handover']
-  ];
-  rows.forEach(function (r) {
-    var row = document.createElement('div'); row.className = 'review-row';
-    row.innerHTML = '<div><span class="k mono"></span><span class="v"></span><span class="s"></span></div><button type="button">Edit</button>';
-    row.querySelector('.k').textContent = r[0]; row.querySelector('.v').textContent = r[1]; row.querySelector('.s').textContent = r[2];
-    row.querySelector('button').addEventListener('click', function () { go(r[3]); });
-    list.appendChild(row);
-  });
-  var fee = document.createElement('div'); fee.className = 'row total'; fee.style.fontSize = '16px'; fee.style.padding = '14px 0';
-  fee.innerHTML = '<span>Delivery fee</span><span style="font-size:22px"></span>'; fee.lastChild.textContent = fmt(S.quote.fee) + ' RWF';
-  list.appendChild(fee);
+function renderDetailsHint() {
+  var d = S.details, n = [d.item, d.weight, d.fragile ? 'f' : '', d.payer, d.payMethod, d.notes].filter(Boolean).length;
+  $('detailsHint').textContent = n ? n + ' added' : 'Item, weight, fragile, who pays, notes';
+  $('detailsToggle').textContent = $('detailsBody').hidden ? 'Optional' : 'Hide';
 }
 
 /* ---------- submit + WhatsApp ---------- */
@@ -712,16 +950,25 @@ function message() {
 }
 function waUrl() { return 'https://wa.me/' + CONFIG.WHATSAPP + '?text=' + encodeURIComponent(message()); }
 
+$('confirmBtn').addEventListener('click', function () {
+  if (S.sendFailed) return finish(false);
+  if (S.when === 'later' && !S.whenAt) { $('whenErr').textContent = 'Choose a pickup date and time.'; return; }
+  submitOrder();
+});
 function submitOrder() {
   if (S.sending) return;
-  S.sending = true; $('nextBtn').disabled = true; $('nextBtn').textContent = 'Sending…'; $('sendErr').textContent = '';
+  S.sending = true; $('sendErr').textContent = ''; renderBar();
   var payload = {
     pickup: S.pickup, drop: S.drop, size: S.size, when: S.when, whenAt: S.whenAt,
-    handover: { type: S.handover, name: S.sender.name, phone: S.sender.phone },
-    receiver: S.receiver, customer: S.customer, details: S.details
+    handover: S.handover === 'other' ? { type: 'other', name: S.sender.name, phone: S.sender.phone } : { type: 'me', name: '', phone: '' },
+    receiver: S.receiver, customer: S.customer, details: S.details, route: S.route || null
   };
-  fetch(CONFIG.SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
-    .then(function (r) { return r.json(); })
+  // No automatic retry here (it could save the order twice). After 30 s the customer
+  // gets the "Send on WhatsApp instead" button, so the order still reaches ops.
+  var ctl = window.AbortController ? new AbortController() : null;
+  var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 30000);
+  fetch(CONFIG.SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload), signal: ctl ? ctl.signal : undefined })
+    .then(function (r) { clearTimeout(timer); return r.json(); })
     .then(function (j) {
       S.sending = false;
       if (!j.ok) throw new Error(j.error);
@@ -730,35 +977,32 @@ function submitOrder() {
       finish(true);
     })
     .catch(function (err) {
-      S.sending = false; $('nextBtn').disabled = false; $('nextBtn').textContent = LABELS.review;
-      if (String(err && err.message) === 'outside') { $('sendErr').textContent = 'One of the pins is outside our area. Tap Edit to change it.'; return; }
+      clearTimeout(timer);
+      S.sending = false;
+      if (String(err && err.message) === 'outside') { $('sendErr').textContent = 'One of the pins is outside our area. Tap Edit to change it.'; renderBar(); return; }
       $('sendErr').textContent = 'We couldn’t save your order online. Tap below to send it on WhatsApp instead.';
-      $('nextBtn').textContent = 'Send on WhatsApp instead';
-      $('nextBtn').onclick = function () { finish(false); };
+      S.sendFailed = true; renderBar();
     });
 }
-function finish(saved) {
+function finish(savedOnline) {
   save('customer', { name: S.customer.name, phone: S.customer.phone });
-  $('doneTitle').textContent = saved ? 'Order ' + S.orderId + ' received' : 'Almost there';
-  $('doneSub').textContent = saved ? 'WhatsApp should open with your order. Press send so we can assign a rider.' : 'Send the message in WhatsApp and we’ll take it from there.';
+  $('doneTitle').textContent = savedOnline ? 'Order ' + S.orderId + ' received' : 'Almost there';
+  $('doneSub').textContent = savedOnline ? 'WhatsApp should open with your order. Press send so we can assign a rider.' : 'Send the message in WhatsApp and we’ll take it from there.';
   $('waLink').href = waUrl();
   go('done');
   setTimeout(function () { window.location.href = waUrl(); }, 400);
 }
 $('againBtn').addEventListener('click', function () {
-  var c = S.customer;
-  S.pickup = S.drop = S.quote = null; S.quoteKey = ''; S.size = ''; S.when = 'now'; S.whenAt = ''; S.handover = '';
-  S.sender = { name: '', phone: '' }; S.receiver = { name: '', phone: '' }; S.customer = c; S.orderId = '';
+  S.pickup = S.drop = S.quote = S.route = S.routeGeo = null; S.quoteKey = ''; S.size = ''; S.when = 'now'; S.whenAt = ''; S.handover = 'me';
+  S.sender = { name: '', phone: '' }; S.receiver = { name: '', phone: '' }; S.orderId = ''; S.sendFailed = false; S.active = 'pickup';
   S.details = { item: '', weight: '', fragile: false, payer: '', payMethod: '', notes: '' };
-  $('nextBtn').onclick = null;
-  if (mA) { map.removeLayer(mA); mA = null; } if (mB) { map.removeLayer(mB); mB = null; }
+  if (map) { Object.keys(markers).forEach(function (w) { if (markers[w]) { map.removeLayer(markers[w]); markers[w] = null; } }); if (routeLine) { map.removeLayer(routeLine); routeLine = null; } }
   go('welcome');
 });
 
 /* ---------- wire up ---------- */
-$('nextBtn').addEventListener('click', function () { if (!this.onclick) next(); });
-$('skipBtn').addEventListener('click', function () { go(seq()[seq().indexOf('details') + 1]); });
 $('backBtn').addEventListener('click', back);
+renderWelcome();
 if (/X/.test(CONFIG.WHATSAPP)) console.warn('Moving Man: set CONFIG.WHATSAPP to the business WhatsApp number (digits only).');
 </script>
 </body>
