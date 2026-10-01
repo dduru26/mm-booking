@@ -262,7 +262,7 @@
    ===================================================================== */
 var CONFIG = {
   SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx5UplBs9aj-1liiOeWVGEvlHxFvEqeEDbFHVoekW90JN92uq2660fNWZOBq6bLnNOZ/exec',
-  WHATSAPP: '250781727394',                             // business WhatsApp, digits only, e.g. 250795927849
+  WHATSAPP: '250XXXXXXXXX',                             // business WhatsApp, digits only, e.g. 250795927849
   CENTER: [-1.9499, 30.0913],                           // Kigali
   BOUNDS: [[-2.10, 29.95], [-1.80, 30.30]]
 };
@@ -562,7 +562,7 @@ function renderPrice() {
   card.innerHTML = '<div class="k mono">YOUR DELIVERY FEE</div><div class="v"></div><div class="m"></div>' +
     '<div class="route"><div><span class="dot" style="background:#F5F1EA;color:#16130F">A</span><span class="a"></span></div><div><span class="dot" style="background:#B93C14;color:#fff">B</span><span class="b"></span></div></div>';
   card.querySelector('.v').textContent = fmt(q.fee) + ' RWF';
-  card.querySelector('.m').textContent = q.km.toFixed(1) + ' km by road · about ' + q.mins + ' min' + (q.source === 'estimate' ? ' · estimated' : '');
+  card.querySelector('.m').textContent = q.km.toFixed(2) + ' km by road · about ' + q.mins + ' min' + (q.source === 'estimate' ? ' · estimated' : '');
   card.querySelector('.a').textContent = S.pickup.name; card.querySelector('.b').textContent = S.drop.name;
   box.appendChild(card);
   var t = document.createElement('div'); t.className = 'table'; t.style.marginTop = '16px';
@@ -673,7 +673,7 @@ function renderReview() {
     ['PICKUP · A', S.pickup.name + (S.pickup.note ? ' — ' + S.pickup.note : ''), 'Hand over: ' + handText(), 'pickup'],
     ['DROP-OFF · B', S.drop.name + (S.drop.note ? ' — ' + S.drop.note : ''), 'Receiver: ' + S.receiver.name + ' · ' + phone(S.receiver.phone).pretty, 'drop'],
     ['PARCEL', parcelText() || '—', [S.details.payer ? S.details.payer + ' pays' : '', S.details.payMethod, S.details.notes ? 'Note: ' + S.details.notes : ''].filter(Boolean).join(' · ') || 'No notes', 'details'],
-    ['WHEN', whenText(), S.quote.km.toFixed(1) + ' km · about ' + S.quote.mins + ' min', 'price'],
+    ['WHEN', whenText(), S.quote.km.toFixed(2) + ' km · about ' + S.quote.mins + ' min', 'price'],
     ['YOUR CONTACT', S.customer.name, phone(S.customer.phone).pretty, S.handover === 'other' ? 'you' : 'handover']
   ];
   rows.forEach(function (r) {
@@ -705,7 +705,7 @@ function message() {
     '',
     'PARCEL: ' + (parcelText() || '—') + (S.details.notes ? '\nNote: ' + S.details.notes : ''),
     'WHEN: ' + whenText(),
-    'FEE: ' + fmt(S.quote.fee) + ' RWF (' + S.quote.km.toFixed(1) + ' km)' + (S.details.payer ? ' · ' + S.details.payer + ' pays' : '') + (S.details.payMethod ? ' by ' + S.details.payMethod : ''),
+    'FEE: ' + fmt(S.quote.fee) + ' RWF (' + S.quote.km.toFixed(2) + ' km)' + (S.details.payer ? ' · ' + S.details.payer + ' pays' : '') + (S.details.payMethod ? ' by ' + S.details.payMethod : ''),
     '',
     'From: ' + S.customer.name + ' · ' + phone(S.customer.phone).pretty
   ].join('\n');
@@ -759,7 +759,7 @@ $('againBtn').addEventListener('click', function () {
 $('nextBtn').addEventListener('click', function () { if (!this.onclick) next(); });
 $('skipBtn').addEventListener('click', function () { go(seq()[seq().indexOf('details') + 1]); });
 $('backBtn').addEventListener('click', back);
-if (/X/.test(250781727394)) console.warn('Moving Man: set CONFIG.WHATSAPP to the business WhatsApp number (digits only).');
+if (/X/.test(CONFIG.WHATSAPP)) console.warn('Moving Man: set CONFIG.WHATSAPP to the business WhatsApp number (digits only).');
 </script>
 </body>
 </html>
