@@ -262,7 +262,7 @@
    ===================================================================== */
 var CONFIG = {
   SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbx5UplBs9aj-1liiOeWVGEvlHxFvEqeEDbFHVoekW90JN92uq2660fNWZOBq6bLnNOZ/exec',
-  WHATSAPP: '250781727394',                             // business WhatsApp, digits only, e.g. 250795927849
+  WHATSAPP: '250XXXXXXXXX',                             // business WhatsApp, digits only, e.g. 250795927849
   CENTER: [-1.9499, 30.0913],                           // Kigali
   BOUNDS: [[-2.10, 29.95], [-1.80, 30.30]]
 };
@@ -533,29 +533,13 @@ document.querySelectorAll('[data-size]').forEach(function (b) {
 
 /* ---------- price ---------- */
 function fmt(n) { return Number(n).toLocaleString('en-US'); }
-/* Road distance from the same OSRM server the Pricing Lab uses, fetched by the phone
-   (fast) rather than by Apps Script (slow from Google's servers). The script checks it
-   is plausible before pricing with it. Resolves null if it fails or takes over 8 s. */
-function roadRoute(a, b) {
-  var ctl = window.AbortController ? new AbortController() : null;
-  var timer = setTimeout(function () { if (ctl) ctl.abort(); }, 8000);
-  var url = 'https://routing.openstreetmap.de/routed-car/route/v1/driving/' + a.lng + ',' + a.lat + ';' + b.lng + ',' + b.lat + '?overview=false&steps=false';
-  return fetch(url, ctl ? { signal: ctl.signal } : {}).then(function (r) { return r.json(); }).then(function (j) {
-    clearTimeout(timer);
-    if (j.code !== 'Ok' || !j.routes || !j.routes[0]) return null;
-    return { km: j.routes[0].distance / 1000, mins: Math.ceil(j.routes[0].duration / 60) };
-  }).catch(function () { clearTimeout(timer); return null; });
-}
 function getQuote() {
   var key = [S.pickup.lat, S.pickup.lng, S.drop.lat, S.drop.lng].join(',');
   if (S.quote && S.quoteKey === key) return renderPrice();
   S.quoting = true; S.quote = null; $('nextBtn').disabled = true;
   $('priceBox').innerHTML = '<div class="skeleton" aria-label="Calculating your price"></div>';
   var url = CONFIG.SCRIPT_URL + '?action=quote&pLat=' + S.pickup.lat + '&pLng=' + S.pickup.lng + '&dLat=' + S.drop.lat + '&dLng=' + S.drop.lng;
-  roadRoute(S.pickup, S.drop).then(function (rt) {
-    S.route = rt;
-    return fetch(url + (rt ? '&rk=' + rt.km + '&rm=' + rt.mins : ''));
-  }).then(function (r) { return r.json(); }).then(function (j) {
+  fetch(url).then(function (r) { return r.json(); }).then(function (j) {
     S.quoting = false;
     if (!j.ok) throw new Error(j.error || 'quote failed');
     S.quote = j; S.quoteKey = key; renderPrice();
@@ -734,7 +718,7 @@ function submitOrder() {
   var payload = {
     pickup: S.pickup, drop: S.drop, size: S.size, when: S.when, whenAt: S.whenAt,
     handover: { type: S.handover, name: S.sender.name, phone: S.sender.phone },
-    receiver: S.receiver, customer: S.customer, details: S.details, route: S.route || null
+    receiver: S.receiver, customer: S.customer, details: S.details
   };
   fetch(CONFIG.SCRIPT_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
     .then(function (r) { return r.json(); })
