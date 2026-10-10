@@ -270,8 +270,9 @@ In the Apps Script editor (owner):
    URL for Hostinger.
 5. **Do not edit the existing deployment.** The page's `SCRIPT_URL` keeps serving the old version.
 
-The script source becomes version-controlled here under `apps-script/` for the first time; the copy
-deployed today is kept as a test fixture (§7.2).
+**The script never goes into this repo.** It is written and tested in a separate local workspace,
+`mm-booking-script/`, beside this repo and never pushed. The owner receives `Api.gs` plus the one-line
+`doPost` change and pastes them into the Apps Script editor.
 
 ## 7. Testing
 
@@ -290,10 +291,11 @@ Test-first throughout. One behaviour per test, names read as sentences.
 
 ### 7.2 Apps Script
 
-The `.gs` files run in a Node `vm` context with in-memory stand-ins for `SpreadsheetApp`, `LockService`,
+These tests live in the local `mm-booking-script/` workspace with the script, not in this repo. The
+`.gs` files run in a Node `vm` context with in-memory stand-ins for `SpreadsheetApp`, `LockService`,
 `PropertiesService`, `CacheService`, `MailApp`, `UrlFetchApp`, `Maps`, `Utilities` and `ContentService`.
 
-- **Website unchanged (characterisation):** the deployed `Code.gs` (fixture) and the extended
+- **Website unchanged (characterisation):** the deployed `Code.gs` (kept as a local fixture) and the extended
   `Code.gs + Api.gs` each receive the same web bodies — draft, confirm, paused, outside, missing receiver,
   malformed JSON — and must produce identical replies, Requests rows, Quotes rows, emails and Order ids.
 - **API path:** unknown key refused; disabled client refused; `op:'client'` returns the row; paused;
@@ -324,7 +326,7 @@ script's area check decides.
 ## 9. Rollout
 
 1. PR from `client-booking-api` into `main` of `dduru26/mm-booking`.
-2. Owner ships the script extension (§6.3).
+2. Owner pastes `Api.gs` and the `doPost` line into the Apps Script editor and ships them (§6.3).
 3. Hostinger hPanel → Add Website → Node.js Web App → import this repo from the `client-booking-api`
    branch; set `SCRIPT_URL`. The GitHub account connected to Hostinger needs access to
    `dduru26/mm-booking`.
@@ -345,8 +347,9 @@ script's area check decides.
   this volume. The script already falls back to Google for distance.
 - **Apps Script limits.** Calls take seconds; daily quotas apply to email and URL fetches. The current
   triple-recording of web orders (§11) also triples email use until it is fixed.
-- **Public repo.** `dduru26/mm-booking` is public, so the script source and this spec become public. No
-  key or secret is ever committed; the script URL is already public in `index.html`.
+- **Public repo.** `dduru26/mm-booking` is public. The script source stays out of it (§6.3), but this
+  spec, which describes the script's behaviour, becomes public. No key or secret is ever committed; the
+  script URL is already public in `index.html`.
 - **Pins are rounded to 6 decimals** before quoting so the script's route cache key matches.
 
 ## 11. Out of scope (separate changes)
