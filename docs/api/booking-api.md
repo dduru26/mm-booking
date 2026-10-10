@@ -2,7 +2,7 @@
 
 Book Moving Man bike deliveries in Kigali from your own system.
 
-Base URL: `https://book.movingman.online`
+Base URL: `https://movingman.online`
 Authentication: send your key in the `X-API-Key` header on every request. Keep it on your server; never put it in an app or web page.
 
 ## POST /api/quote — price only
@@ -104,7 +104,7 @@ A booking can take up to a minute when a map service is slow. Use a 60-second ti
 ### Example
 
 ```bash
-curl -X POST https://book.movingman.online/api/request \
+curl -X POST https://movingman.online/api/request \
   -H "Content-Type: application/json" \
   -H "X-API-Key: $MOVING_MAN_API_KEY" \
   -d @booking.json

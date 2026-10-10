@@ -1,4 +1,4 @@
-# book.movingman.online
+# movingman.online — booking page and client API
 
 The customer booking page (`index.html`, unchanged) and the client booking API.
 
