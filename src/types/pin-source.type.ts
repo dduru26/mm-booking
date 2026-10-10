@@ -1,1 +1,1 @@
-export type PinSource = 'provided' | 'geocoded';
+export type PinSource = 'provided' | 'geocoded' | 'recorded';

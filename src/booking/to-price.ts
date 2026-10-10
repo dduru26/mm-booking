@@ -7,7 +7,7 @@ import type { PriceLine } from '../types/price-line.type.js';
 import type { PricedReply } from '../types/priced-reply.type.js';
 
 export function toPrice(reply: PricedReply): Price {
-  if (typeof reply.fee !== 'number' || typeof reply.km !== 'number' || typeof reply.mins !== 'number') {
+  if (!isWholePositive(reply.fee) || typeof reply.km !== 'number' || typeof reply.mins !== 'number') {
     throw new ApiError(ERROR_CODE.UPSTREAM_REJECTED, { message: DETAIL_MESSAGE.NO_PRICE });
   }
   return {
@@ -17,6 +17,10 @@ export function toPrice(reply: PricedReply): Price {
     est_minutes: reply.mins,
     breakdown: toBreakdown(reply),
   };
+}
+
+function isWholePositive(value: number | undefined): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
 }
 
 function toBreakdown(reply: PricedReply): PriceLine[] {

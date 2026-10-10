@@ -94,7 +94,7 @@ JSON, max 10 kB. `/api/request` uses every field; `/api/quote` uses only the sta
 | `receiver_address` ★ | yes | 2–80 chars | Drop Area |
 | `receiver_phone` | yes | Rwandan mobile | Drop Phone |
 | `receiver_pin` ★ | no | see §4.3 | Drop Lat,Lng / Pin / Map |
-| `pickup_time` | yes | `"now"`, or ISO-8601; no offset = Kigali time; ≤ 5 min in the past; ≤ 30 days ahead | Requested Pickup (`ASAP` or `YYYY-MM-DD HH:mm`) |
+| `pickup_time` | yes | `"now"`, or ISO-8601; no offset = Kigali time; ≤ 30 days ahead; up to 2 h in the past counts as now (so a late retry reaches the duplicate check), older is refused | Requested Pickup (`ASAP` or `YYYY-MM-DD HH:mm`) |
 | `payer` | yes | `sender` \| `receiver` | Paid By |
 | `pay_method` | yes | `momo` \| `cash` \| `account`; `account` requires `payer: sender` | Pay Method |
 | `size` | no | `small` (default) \| `medium` — bikes only, so no `large` | Size |
@@ -148,7 +148,8 @@ pins when they have them.
 - `booking_reference` is the script's Order ID — the id ops sees in the sheet and the alert email.
 - `price` is what the script charged when it wrote the row, not a separate estimate. On a duplicate it
   is read from the original row (Fare RWF, Distance km, Est. Minutes) and `breakdown` is empty, because
-  the original breakdown is not stored.
+  the original breakdown is not stored. Its `pins` also come from the original row (`source: "recorded"`),
+  never from the retry, so a resend with different pins cannot look like a change.
 - `recorded` is the written row read back from the sheet (display values), keyed by the script's column
   names (`REQUEST_HEADERS`). Values are as the sheet shows them, e.g. phones without the leading 0.
 

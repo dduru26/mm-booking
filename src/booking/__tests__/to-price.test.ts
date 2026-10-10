@@ -26,6 +26,12 @@ describe('toPrice', () => {
     expect(price).toMatchObject({ amount_rwf: 2018, breakdown: [] });
   });
 
+  it.each([0, -600, 2018.5])('refuses a fee of %s instead of passing it on', (fee) => {
+    const error = thrownBy(() => toPrice({ fee, km: 7.26, mins: 14 }));
+
+    expect(error).toMatchObject({ code: 'UPSTREAM_REJECTED', message: 'The booking service returned no price.' });
+  });
+
   it('refuses a reply without a fee instead of pricing it at zero', () => {
     const error = thrownBy(() => toPrice({ km: 7.26, mins: 14 }));
 

@@ -56,6 +56,27 @@ describe('POST /api/request', () => {
     expect(response.body).toMatchObject({ duplicate: true, booking_reference: 'MM-1010-A01', price: { amount_rwf: 2018, breakdown: [] } });
   });
 
+  it("answers a repeat with the pins it was booked with, not the retry's", async () => {
+    const { app, scriptClient } = createTestApp();
+    scriptClient.orderReply = ORDER_REPLY_REPEAT;
+
+    const response = await book(app, bookingPayload({ restaurant_pin: '-1.95,30.06' }));
+
+    expect(response.body.pins).toEqual({
+      pickup: { lat: -1.93422, lng: 30.084892, source: 'recorded', matched: null },
+      dropoff: { lat: -1.929434, lng: 30.134337, source: 'recorded', matched: null },
+    });
+  });
+
+  it('books a retry that arrives after its pickup time has passed', async () => {
+    const { app, scriptClient } = createTestApp();
+
+    const response = await book(app, bookingPayload({ pickup_time: '2026-10-10T11:30:00Z' }));
+
+    expect(response.status).toBe(201);
+    expect(scriptClient.calls.placeOrder[0]).toMatchObject({ when: 'now', whenAt: '' });
+  });
+
   it.each([
     ['paused', 503, 'NOT_ACCEPTING_ORDERS'],
     ['outside', 422, 'OUTSIDE_SERVICE_AREA'],

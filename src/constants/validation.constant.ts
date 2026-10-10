@@ -23,7 +23,7 @@ export const RWANDA_PHONE = {
   MOBILE_PATTERN: /^7[2389]\d{7}$/,
 } as const;
 
-export const PICKUP_WINDOW = { PAST_GRACE_MS: 5 * 60_000, MAX_AHEAD_MS: 30 * 24 * 60 * 60_000 } as const;
+export const PICKUP_WINDOW = { PAST_GRACE_MS: 2 * 60 * 60_000, MAX_AHEAD_MS: 30 * 24 * 60 * 60_000 } as const;
 export const ISO_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::\d{2}(?:\.\d{1,3})?)?(Z|[+-]\d{2}:\d{2})?$/;
 export const ISO_GROUP = { YEAR: 1, MONTH: 2, DAY: 3, ZONE: 6 } as const;
 export const MONTHS_IN_YEAR = 12;
@@ -36,6 +36,6 @@ export const VALIDATION_MESSAGE = {
   REFERENCE: 'Use letters, digits, dot, underscore or hyphen.',
   ACCOUNT_PAYER: 'Account payment is only for deliveries the sender pays for.',
   PICKUP_FORMAT: 'Use "now" or an ISO-8601 time such as 2026-10-10T14:30 (Kigali time) or 2026-10-10T12:30:00Z.',
-  PICKUP_PAST: 'Pickup time is in the past.',
+  PICKUP_PAST: 'Pickup time is more than 2 hours in the past.',
   PICKUP_TOO_FAR: 'Pickup time is more than 30 days ahead.',
 } as const;

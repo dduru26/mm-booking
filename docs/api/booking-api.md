@@ -44,7 +44,7 @@ Same body as a booking, but only these fields are read: `booking_company`, `rest
 | `receiver_name` | yes | 2–60 characters |
 | `receiver_address` | yes | 2–80 characters |
 | `receiver_phone` | yes | Rwandan mobile, e.g. `078 123 4567` or `+250781234567` |
-| `pickup_time` | yes | `"now"`, or ISO-8601. Without an offset it is Kigali time. Not in the past, at most 30 days ahead |
+| `pickup_time` | yes | `"now"`, or ISO-8601. Without an offset it is Kigali time. At most 30 days ahead. A time up to 2 hours in the past is treated as now, so a late retry still goes through; anything older is refused |
 | `payer` | yes | `sender` or `receiver` |
 | `pay_method` | yes | `momo`, `cash` or `account` (`account` = billed to you; needs `payer: sender`) |
 | `size` | no | `small` (default) or `medium`. Our riders are on bikes |
@@ -74,6 +74,7 @@ Empty strings and `null` in optional fields count as absent.
 - `booking_reference` is the id our team uses; quote it when you call us.
 - Prices are whole Rwandan francs. On a repeat, `breakdown` is empty.
 - Check `pins`: when `source` is `geocoded`, `matched` shows the place we found.
+- A repeat returns the original booking unchanged, and its `pins` are the ones it was booked with (`source: "recorded"`). Resending with different details does not change a booking — call us to change one.
 - `recorded` is the booking exactly as our team sees it.
 
 ### Errors

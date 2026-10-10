@@ -34,10 +34,16 @@ describe('toPickupWhen', () => {
     expect(result).toEqual({ ok: true, value: { when: 'now', whenAt: '' } });
   });
 
-  it('refuses a time more than five minutes ago', () => {
-    const result = toPickupWhen('2026-10-10T11:50:00Z', NOW);
+  it('treats a time up to two hours ago as as soon as possible, so a late retry still books', () => {
+    const result = toPickupWhen('2026-10-10T10:01:00Z', NOW);
 
-    expect(result).toEqual({ ok: false, message: 'Pickup time is in the past.' });
+    expect(result).toEqual({ ok: true, value: { when: 'now', whenAt: '' } });
+  });
+
+  it('refuses a time more than two hours ago', () => {
+    const result = toPickupWhen('2026-10-10T09:59:00Z', NOW);
+
+    expect(result).toEqual({ ok: false, message: 'Pickup time is more than 2 hours in the past.' });
   });
 
   it('refuses a time more than 30 days ahead', () => {

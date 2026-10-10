@@ -18,3 +18,4 @@ export const CURRENCY = 'RWF';
 export const BASE_FARE_LABEL = 'Base fare';
 export const NO_WEIGHT = '';
 export const NO_NOTE = '';
+export const RECORDED_COLUMN = { PICKUP_LAT_LNG: 'Pickup Lat,Lng', DROP_LAT_LNG: 'Drop Lat,Lng' } as const;
