@@ -161,7 +161,7 @@ or 5xx, retry with the same `external_reference`.
 ### 4.5 Errors
 
 Every error: `{ "ok": false, "error": { "code": "…", "message": "…", "fields": [{ "field": "…", "message": "…" }] } }`
-(`fields` only on validation errors).
+(`fields` on validation and address errors).
 
 | HTTP | Code | When |
 |---|---|---|
@@ -176,7 +176,8 @@ Every error: `{ "ok": false, "error": { "code": "…", "message": "…", "fields
 | 503 | `NOT_ACCEPTING_ORDERS` | Settings → `ACCEPTING_ORDERS` is `FALSE` |
 | 502 | `UPSTREAM_REJECTED` | Script returned any other `ok: false`; message passed through |
 | 504 | `UPSTREAM_UNAVAILABLE` | Script, Photon or OSRM still failing after retries |
-| 500 | `INTERNAL` | Our fault (logged) |
+| 404 | `NOT_FOUND` | No such `/api` endpoint |
+| 500 | `INTERNAL` | Our fault, or a client row with no valid Dispatch Phone (logged) |
 
 ## 5. Request flow
 
